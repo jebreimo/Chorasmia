@@ -9,7 +9,7 @@
 
 #include <cstddef>
 
-namespace GridLib
+namespace Chorasmia
 {
     template <typename T>
     class ArrayView
@@ -41,7 +41,7 @@ namespace GridLib
         }
 
         [[nodiscard]]
-        size_t size() const
+        constexpr size_t size() const
         {
             return m_Size;
         }
@@ -59,17 +59,17 @@ namespace GridLib
                    && (a.data() == b.data()
                        || std::equal(a.begin(), a.end(), b.begin()));
         }
+
+        [[nodiscard]]
+        friend bool operator!=(const ArrayView& a, const ArrayView& b)
+        {
+            return !(a == b);
+        }
+
     private:
         const T* m_Data = nullptr;
         size_t m_Size = 0;
     };
-
-    template <typename T>
-    [[nodiscard]]
-    bool operator!=(const ArrayView<T>& a, const ArrayView<T>& b)
-    {
-        return !(a == b);
-    }
 
     template <typename T>
     [[nodiscard]]

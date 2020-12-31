@@ -16,7 +16,7 @@ FetchContent_MakeAvailable(catch)
 
 add_executable(ChorasmiaTest
     ChorasmiaTestMain.cpp
-    test_Array2D.cpp)
+    test_Array2D.cpp test_ArrayView2D.cpp)
 
 target_link_libraries(ChorasmiaTest
     PRIVATE

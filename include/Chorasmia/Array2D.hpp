@@ -6,11 +6,9 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #pragma once
-#include <stdexcept>
-#include <vector>
-#include "MutableArray2DView.hpp"
+#include "MutableArrayView2D.hpp"
 
-namespace GridLib
+namespace Chorasmia
 {
     template <typename T>
     class Array2D
@@ -23,67 +21,66 @@ namespace GridLib
 
         Array2D(size_t rows, size_t columns)
             : m_Buffer(rows * columns),
-              m_Size(rows, columns)
+              m_RowCount(rows),
+              m_ColumnCount(columns)
         {}
 
         Array2D(const T* values, size_t rows, size_t columns)
             : m_Buffer(values, values + rows * columns),
-              m_Size(rows, columns)
+              m_RowCount(rows),
+              m_ColumnCount(columns)
         {}
 
         Array2D(std::vector<T> values, size_t rows, size_t columns)
             : m_Buffer(std::move(values)),
-              m_Size(rows, columns)
+              m_RowCount(rows),
+              m_ColumnCount(columns)
         {
-            if (size() != m_Buffer.size())
+            if (valueCount() != m_Buffer.size())
                 throw std::runtime_error("Array2D has incorrect size.");
         }
 
-        explicit constexpr operator ArrayView<T>() const noexcept
+        constexpr operator ArrayView2D<T>() const noexcept
         {
-            return {data(), size()};
+            return {data(), rowCount(), columnCount()};
         }
 
-        explicit constexpr operator MutableArrayView<T>() const noexcept
+        constexpr operator MutableArrayView2D<T>() noexcept
         {
-            return {data(), size()};
+            return {data(), rowCount(), columnCount()};
         }
 
-        constexpr operator Array2DView<T>() const noexcept
-        {
-            return {data(), rows(), columns()};
-        }
-
-        operator MutableArray2DView<T>() noexcept
-        {
-            return {data(), rows(), columns()};
-        }
-
-        constexpr MutableArrayView<T> operator[](size_t row)
-        {
-            return {data() + row * m_Size.second, m_Size.second};
-        }
-
-        constexpr ArrayView<T> operator[](size_t row) const
-        {
-            return {data() + row * m_Size.second, m_Size.second};
-        }
-
+        [[nodiscard]]
         const T& operator()(size_t row, size_t column) const noexcept
         {
-            return m_Buffer[row * columns() + column];
+            return m_Buffer[row * columnCount() + column];
         }
 
+        [[nodiscard]]
         T& operator()(size_t row, size_t column) noexcept
         {
-            return m_Buffer[row * columns() + column];
+            return m_Buffer[row * columnCount() + column];
         }
 
+        [[nodiscard]]
+        constexpr ArrayView<T> operator[](size_t row) const
+        {
+            return {data() + row * columnCount(), columnCount()};
+        }
+
+        [[nodiscard]]
+        constexpr MutableArrayView<T> operator[](size_t row)
+        {
+            return {data() + row * columnCount(), columnCount()};
+        }
+
+        [[nodiscard]]
         const T* data() const noexcept
         {
             return m_Buffer.data();
         }
 
+        [[nodiscard]]
         T* data() noexcept
         {
             return m_Buffer.data();
@@ -96,38 +93,81 @@ namespace GridLib
         }
 
         [[nodiscard]]
-        size_t rows() const noexcept
+        ArrayView<T> array() const
         {
-            return m_Size.first;
+            return ArrayView<T>(data(), valueCount());
         }
 
         [[nodiscard]]
-        size_t columns() const noexcept
+        MutableArrayView<T> array()
         {
-            return m_Size.second;
+            return MutableArrayView<T>(data(), valueCount());
         }
 
         [[nodiscard]]
-        size_t size() const noexcept
+        ArrayView2D<T> subarray(size_t row, size_t column,
+                                size_t nrows = SIZE_MAX,
+                                size_t ncolumns = SIZE_MAX) const
         {
-            return m_Size.first * m_Size.second;
+            row = std::min(row, rowCount());
+            column = std::min(column, columnCount());
+            nrows = std::min(nrows, rowCount() - row);
+            ncolumns = std::min(ncolumns, columnCount() - column);
+            return {data() + row * columnCount() + column,
+                    nrows,
+                    ncolumns,
+                    columnCount() - ncolumns};
+        }
+
+        [[nodiscard]]
+        MutableArrayView2D<T> subarray(size_t row, size_t column,
+                                       size_t nrows = SIZE_MAX,
+                                       size_t ncolumns = SIZE_MAX)
+        {
+            row = std::min(row, rowCount());
+            column = std::min(column, columnCount());
+            nrows = std::min(nrows, rowCount() - row);
+            ncolumns = std::min(ncolumns, columnCount() - column);
+            return {data() + row * columnCount() + column,
+                    nrows,
+                    ncolumns,
+                    columnCount() - ncolumns};
+        }
+
+        [[nodiscard]]
+        constexpr size_t rowCount() const noexcept
+        {
+            return m_RowCount;
+        }
+
+        [[nodiscard]]
+        constexpr size_t columnCount() const noexcept
+        {
+            return m_ColumnCount;
+        }
+
+        [[nodiscard]]
+        constexpr size_t valueCount() const noexcept
+        {
+            return m_RowCount * m_ColumnCount;
         }
 
         void resize(size_t rows, size_t columns)
         {
-            auto oldSize = size();
-            auto oldRows = this->rows();
-            auto oldColumns = this->columns();
+            auto oldValueCount = valueCount();
+            auto oldRows = this->rowCount();
+            auto oldColumns = this->columnCount();
             auto newSize = rows * columns;
             m_Buffer.resize(newSize);
-            m_Size = {rows, columns};
+            m_RowCount = rows;
+            m_ColumnCount = columns;
 
             if (oldRows == 0)
                 return;
 
             if (columns > oldColumns)
             {
-                auto src = m_Buffer.data() + oldSize - 1;
+                auto src = m_Buffer.data() + oldValueCount - 1;
                 auto dst = m_Buffer.data() + (oldRows - 1) * columns + oldColumns - 1;
                 while (src != dst)
                 {
@@ -153,31 +193,31 @@ namespace GridLib
         [[nodiscard]]
         MutableIterator begin() noexcept
         {
-            return MutableIterator({data(), m_Size.second});
+            return MutableIterator({data(), columnCount()});
         }
 
         [[nodiscard]]
         ConstIterator begin() const noexcept
         {
-            return ConstIterator({data(), m_Size.second});
+            return ConstIterator({data(), columnCount()});
         }
 
         [[nodiscard]]
         MutableIterator end() noexcept
         {
-            return MutableIterator({data() + size(), m_Size.second});
+            return MutableIterator({data() + valueCount(), columnCount()});
         }
 
         [[nodiscard]]
         ConstIterator end() const noexcept
         {
-            return ConstIterator({data() + size(), m_Size.second});
+            return ConstIterator({data() + valueCount(), columnCount()});
         }
 
         [[nodiscard]]
         std::vector<T> release()
         {
-            m_Size = {};
+            m_RowCount = m_ColumnCount = 0;
             auto tmp = std::move(m_Buffer);
             return std::move(tmp);
         }
@@ -186,22 +226,25 @@ namespace GridLib
         {
             std::fill(m_Buffer.begin(), m_Buffer.end(), value);
         }
+
+        [[nodiscard]]
+        friend bool
+        operator==(const Array2D& a, const Array2D& b)
+        {
+            return a.rowCount() == b.rowCount()
+                   && a.columnCount() == b.columnCount()
+                   && a.m_Buffer == b.m_Buffer;
+        }
+
+        [[nodiscard]]
+        friend bool
+        operator!=(const Array2D& a, const Array2D& b)
+        {
+            return !(a == b);
+        }
     private:
         std::vector<T> m_Buffer;
-        std::pair<size_t, size_t> m_Size;
+        size_t m_RowCount = 0;
+        size_t m_ColumnCount = 0;
     };
-
-    template <typename T>
-    bool operator==(const Array2D<T>& a, const Array2D<T>& b)
-    {
-        return a.rows() == b.rows()
-               && a.columns() == b.columns()
-               && std::equal(a.begin(), a.end(), b.begin());
-    }
-
-    template <typename T>
-    bool operator!=(const Array2D<T>& a, const Array2D<T>& b)
-    {
-        return !(a == b);
-    }
 }

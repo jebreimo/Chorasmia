@@ -7,10 +7,10 @@
 //****************************************************************************
 #pragma once
 #include <vector>
-#include "RowIterator.hpp"
 #include "ChorasmiaException.hpp"
+#include "RowIterator.hpp"
 
-namespace GridLib
+namespace Chorasmia
 {
     template <typename It1, typename It2>
     bool equalSequencesWithGaps(It1 seq1, It1 endSeq1, size_t gapSize1,
@@ -34,44 +34,55 @@ namespace GridLib
     }
 
     template <typename T>
-    class Array2DView
+    class ArrayView2D
     {
     public:
-        constexpr Array2DView() = default;
+        using ConstIterator = RowIterator<T>;
 
-        constexpr Array2DView(const T* data,
+        constexpr ArrayView2D() = default;
+
+        constexpr ArrayView2D(const T* data,
                               size_t rows,
                               size_t columns) noexcept
-            : Array2DView(data, rows, columns, 0)
+            : ArrayView2D(data, rows, columns, 0)
         {}
 
-        constexpr Array2DView(const T* data,
+        constexpr ArrayView2D(const T* data,
                               size_t rows,
                               size_t columns,
                               size_t rowGapSize) noexcept
             : m_Data(data),
-              m_Size(rows, columns),
+              m_RowCount(rows),
+              m_ColumnCount(columns),
               m_RowGap(rowGapSize)
         {}
 
-        const T& operator()(size_t row, size_t column) const
+        [[nodiscard]]
+        const T& operator()(size_t row, size_t column) const noexcept
         {
             return m_Data[row * rowSize() + column];
         }
 
-        constexpr const T* data() const
+        [[nodiscard]]
+        ArrayView<T> operator[](size_t r) const noexcept
+        {
+            return {m_Data + r * rowSize(), columnCount()};
+        }
+
+        [[nodiscard]]
+        constexpr const T* data() const noexcept
         {
             return m_Data;
         }
 
         [[nodiscard]]
-        constexpr bool empty() const
+        constexpr bool empty() const noexcept
         {
-            return m_Size == std::pair(size_t(0), size_t(0));
+            return m_RowCount == 0 || m_ColumnCount == 0;
         }
 
         [[nodiscard]]
-        constexpr bool contiguous() const
+        constexpr bool contiguous() const noexcept
         {
             return m_RowGap == 0;
         }
@@ -80,14 +91,14 @@ namespace GridLib
         ArrayView<T> array() const
         {
             if (!contiguous())
-                CHORASMIA_THROW("Can not create ArrayView from non-contiguous Array2DView.");
+                CHORASMIA_THROW("Can not create ArrayView from non-contiguous ArrayView2D.");
             return ArrayView<T>(m_Data, valueCount());
         }
 
         [[nodiscard]]
-        Array2DView<T> subarray(size_t row, size_t column,
+        ArrayView2D<T> subarray(size_t row, size_t column,
                                 size_t nrows = SIZE_MAX,
-                                size_t ncolumns = SIZE_MAX)
+                                size_t ncolumns = SIZE_MAX) const
         {
             row = std::min(row, rowCount());
             column = std::min(column, columnCount());
@@ -100,43 +111,37 @@ namespace GridLib
         }
 
         [[nodiscard]]
-        ArrayView<T> row(size_t r) const
+        constexpr size_t rowCount() const noexcept
         {
-            return {m_Data + r * rowSize(), columnCount()};
+            return m_RowCount;
         }
 
         [[nodiscard]]
-        constexpr size_t rowCount() const
+        constexpr size_t columnCount() const noexcept
         {
-            return m_Size.first;
+            return m_ColumnCount;
         }
 
         [[nodiscard]]
-        constexpr size_t columnCount() const
+        constexpr size_t valueCount() const noexcept
         {
-            return m_Size.second;
+            return m_RowCount * m_ColumnCount;
         }
 
         [[nodiscard]]
-        constexpr size_t valueCount() const
+        ConstIterator begin() const noexcept
         {
-            return m_Size.second;
+            return ConstIterator({m_Data, columnCount()}, m_RowGap);
         }
 
         [[nodiscard]]
-        RowIterator<T> begin() const
+        ConstIterator end() const noexcept
         {
-            return RowIterator<T>({m_Data, columnCount()}, m_RowGap);
+            return ConstIterator({m_Data + rowCount() * rowSize(), columnCount()},
+                                 m_RowGap);
         }
 
-        [[nodiscard]]
-        RowIterator<T> end() const
-        {
-            return RowIterator<T>({m_Data + rowCount() * rowSize(),
-                                   m_Size.second}, m_RowGap);
-        }
-
-        friend bool operator==(const Array2DView& a, const Array2DView& b)
+        friend bool operator==(const ArrayView2D& a, const ArrayView2D& b)
         {
             if (a.rowCount() != b.rowCount()
                 || a.columnCount() != b.columnCount())
@@ -148,6 +153,13 @@ namespace GridLib
                 b.data(), b.m_RowGap,
                 a.columnCount());
         }
+
+        [[nodiscard]]
+        friend bool
+        operator!=(const ArrayView2D& a, const ArrayView2D& b)
+        {
+            return !(a == b);
+        }
     private:
         [[nodiscard]]
         constexpr size_t rowSize() const
@@ -156,13 +168,8 @@ namespace GridLib
         }
 
         const T* m_Data = nullptr;
-        std::pair<size_t, size_t> m_Size;
+        size_t m_RowCount = 0;
+        size_t m_ColumnCount = 0;
         size_t m_RowGap = 0;
     };
-
-    template <typename T>
-    bool operator!=(const Array2DView<T>& a, const Array2DView<T>& b)
-    {
-        return !(a == b);
-    }
 }

@@ -10,7 +10,7 @@
 #include "ArrayView.hpp"
 #include "MutableArrayView.hpp"
 
-namespace GridLib
+namespace Chorasmia
 {
     template <typename T, bool IsMutable = false>
     class RowIterator
@@ -20,6 +20,11 @@ namespace GridLib
             MutableArrayView<T>, ArrayView<T>>::type;
 
         RowIterator() = default;
+
+        constexpr explicit RowIterator(const ArrayViewType& row) noexcept
+            : m_Row(row),
+              m_RowGap(0)
+        {}
 
         constexpr explicit RowIterator(const ArrayViewType& row,
                                        size_t rowGap) noexcept
@@ -84,15 +89,15 @@ namespace GridLib
         }
 
         [[nodiscard]]
-        friend bool operator==(RowIterator a, RowIterator b)
+        friend bool operator==(const RowIterator& a, const RowIterator& b)
         {
-            return areIdentical(a, b);
+            return areIdentical(a.m_Row, b.m_Row) && a.m_RowGap == b.m_RowGap;
         }
 
         [[nodiscard]]
-        friend bool operator!=(RowIterator a, RowIterator b)
+        friend bool operator!=(const RowIterator& a, const RowIterator& b)
         {
-            return !areIdentical(a, b);
+            return !(a == b);
         }
     private:
         [[nodiscard]]

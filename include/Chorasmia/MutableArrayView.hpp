@@ -7,9 +7,9 @@
 //****************************************************************************
 #pragma once
 
-#include <cstddef>
+#include "ArrayView.hpp"
 
-namespace GridLib
+namespace Chorasmia
 {
     template <typename T>
     class MutableArrayView
@@ -64,7 +64,7 @@ namespace GridLib
         }
 
         [[nodiscard]]
-        size_t size() const
+        constexpr size_t size() const
         {
             return m_Size;
         }
@@ -80,8 +80,33 @@ namespace GridLib
         {
             return m_Data;
         }
+
+        [[nodiscard]]
+        friend bool operator==(const MutableArrayView& a,
+                               const MutableArrayView& b)
+        {
+            return a.size() == b.size()
+                   && (a.data() == b.data()
+                       || std::equal(a.begin(), a.end(), b.begin()));
+        }
+
+        [[nodiscard]]
+        friend bool operator!=(const MutableArrayView& a,
+                               const MutableArrayView& b)
+        {
+            return !(a == b);
+        }
+
     private:
         T* m_Data = nullptr;
         size_t m_Size = 0;
     };
+
+    template <typename T>
+    [[nodiscard]]
+    constexpr bool areIdentical(const MutableArrayView<T>& a,
+                                const MutableArrayView<T>& b)
+    {
+        return a.data() == b.data() && a.size() == b.size();
+    }
 }
