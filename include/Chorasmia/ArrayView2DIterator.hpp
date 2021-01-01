@@ -13,33 +13,33 @@
 namespace Chorasmia
 {
     template <typename T, bool IsMutable = false>
-    class RowIterator
+    class ArrayView2DIterator
     {
     public:
         using ArrayViewType = typename std::conditional<IsMutable,
             MutableArrayView<T>, ArrayView<T>>::type;
 
-        RowIterator() = default;
+        ArrayView2DIterator() = default;
 
-        constexpr explicit RowIterator(const ArrayViewType& row) noexcept
+        constexpr explicit ArrayView2DIterator(const ArrayViewType& row) noexcept
             : m_Row(row),
               m_RowGap(0)
         {}
 
-        constexpr explicit RowIterator(const ArrayViewType& row,
-                                       size_t rowGap) noexcept
+        constexpr ArrayView2DIterator(const ArrayViewType& row,
+                                      size_t rowGap) noexcept
             : m_Row(row),
               m_RowGap(rowGap)
         {}
 
-        RowIterator& operator++()
+        ArrayView2DIterator& operator++()
         {
             m_Row = ArrayViewType{m_Row.data() + rowSize(),
                                   m_Row.size()};
             return *this;
         }
 
-        RowIterator operator++(int)
+        ArrayView2DIterator operator++(int)
         {
             auto p = *this;
             m_Row = ArrayViewType{m_Row.data() + rowSize(),
@@ -47,27 +47,27 @@ namespace Chorasmia
             return p;
         }
 
-        RowIterator& operator+=(size_t n)
+        ArrayView2DIterator& operator+=(size_t n)
         {
             m_Row = ArrayViewType{m_Row.data() + n * rowSize(),
                                   m_Row.size()};
             return *this;
         }
 
-        RowIterator& operator--()
+        ArrayView2DIterator& operator--()
         {
             m_Row = {m_Row.data() - rowSize(), m_Row.size()};
             return *this;
         }
 
-        RowIterator operator--(int)
+        ArrayView2DIterator operator--(int)
         {
             auto p = *this;
             m_Row = ArrayViewType{m_Row.data() - rowSize(), m_Row.size()};
             return p;
         }
 
-        RowIterator& operator-=(size_t n)
+        ArrayView2DIterator& operator-=(size_t n)
         {
             m_Row = ArrayViewType{m_Row.data() - n * rowSize(), m_Row.size()};
             return *this;
@@ -89,13 +89,13 @@ namespace Chorasmia
         }
 
         [[nodiscard]]
-        friend bool operator==(const RowIterator& a, const RowIterator& b)
+        friend bool operator==(const ArrayView2DIterator& a, const ArrayView2DIterator& b)
         {
             return areIdentical(a.m_Row, b.m_Row) && a.m_RowGap == b.m_RowGap;
         }
 
         [[nodiscard]]
-        friend bool operator!=(const RowIterator& a, const RowIterator& b)
+        friend bool operator!=(const ArrayView2DIterator& a, const ArrayView2DIterator& b)
         {
             return !(a == b);
         }

@@ -14,8 +14,8 @@ namespace Chorasmia
     class Array2D
     {
     public:
-        using MutableIterator = RowIterator<T, true>;
-        using ConstIterator = RowIterator<T>;
+        using MutableIterator = ArrayView2DIterator<T, true>;
+        using ConstIterator = ArrayView2DIterator<T>;
 
         Array2D() = default;
 

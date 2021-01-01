@@ -8,7 +8,7 @@
 #pragma once
 #include <vector>
 #include "ChorasmiaException.hpp"
-#include "RowIterator.hpp"
+#include "ArrayView2DIterator.hpp"
 
 namespace Chorasmia
 {
@@ -37,7 +37,7 @@ namespace Chorasmia
     class ArrayView2D
     {
     public:
-        using ConstIterator = RowIterator<T>;
+        using ConstIterator = ArrayView2DIterator<T>;
 
         constexpr ArrayView2D() = default;
 

@@ -14,18 +14,18 @@ namespace Chorasmia
     class MutableArrayView2D
     {
     public:
-        using MutableIterator = RowIterator<T, true>;
-        using ConstIterator = RowIterator<T>;
+        using MutableIterator = ArrayView2DIterator<T, true>;
+        using ConstIterator = ArrayView2DIterator<T>;
 
         constexpr MutableArrayView2D() = default;
 
-        constexpr MutableArrayView2D(T* values,
+        constexpr MutableArrayView2D(T* data,
                                      size_t rows,
                                      size_t columns) noexcept
             : MutableArrayView2D(data, rows, columns, 0)
         {}
 
-        constexpr MutableArrayView2D(const T* data,
+        constexpr MutableArrayView2D(T* data,
                                      size_t rows,
                                      size_t columns,
                                      size_t rowGapSize) noexcept
@@ -155,25 +155,27 @@ namespace Chorasmia
         [[nodiscard]]
         MutableIterator begin() noexcept
         {
-            return {{data(), columnCount()}, m_RowGap};
+            return MutableIterator({m_Data, columnCount()}, m_RowGap);
         }
 
         [[nodiscard]]
         ConstIterator begin() const noexcept
         {
-            return {{data(), columnCount()}, m_RowGap};
+            return ConstIterator({m_Data, columnCount()}, m_RowGap);
         }
 
         [[nodiscard]]
         MutableIterator end() noexcept
         {
-            return {{data() + rowCount() * rowSize(), columnCount()}, m_RowGap};
+            return MutableIterator({m_Data + rowCount() * rowSize(), columnCount()},
+                                   m_RowGap);
         }
 
         [[nodiscard]]
         ConstIterator end() const noexcept
         {
-            return {{data() + rowCount() * rowSize(), columnCount()}, m_RowGap};
+            return ConstIterator({m_Data + rowCount() * rowSize(), columnCount()},
+                                 m_RowGap);
         }
 
         [[nodiscard]]

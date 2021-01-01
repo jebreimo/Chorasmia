@@ -41,3 +41,15 @@ TEST_CASE("ArrayView2D iterator.")
         }
     }
 }
+
+TEST_CASE("ArrayView2D equality.")
+{
+    using namespace Chorasmia;
+    std::vector<int32_t> a(12);
+    REQUIRE(ArrayView2D(a.data(), 3, 4) == ArrayView2D(a.data(), 3, 4));
+    REQUIRE(ArrayView2D(a.data(), 3, 4) != ArrayView2D(a.data(), 4, 3));
+    std::vector<int32_t> b(12);
+    REQUIRE(ArrayView2D(a.data(), 3, 4) == ArrayView2D(b.data(), 3, 4));
+    b[3] = 6;
+    REQUIRE(ArrayView2D(a.data(), 3, 4) != ArrayView2D(b.data(), 3, 4));
+}
