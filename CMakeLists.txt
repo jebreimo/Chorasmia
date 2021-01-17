@@ -34,6 +34,10 @@ target_include_directories(Chorasmia
 
 add_library(Chorasmia::Chorasmia ALIAS Chorasmia)
 
+export(TARGETS Chorasmia
+    NAMESPACE Chorasmia::
+    FILE ChorasmiaConfig.cmake)
+
 if (CHORASMIA_BUILD_TEST)
     enable_testing()
 
