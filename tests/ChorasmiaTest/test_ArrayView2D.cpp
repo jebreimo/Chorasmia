@@ -53,3 +53,12 @@ TEST_CASE("ArrayView2D equality.")
     b[3] = 6;
     REQUIRE(ArrayView2D(a.data(), 3, 4) != ArrayView2D(b.data(), 3, 4));
 }
+
+TEST_CASE("ArrayView2D contiguous.")
+{
+    using namespace Chorasmia;
+    std::vector<int32_t> a(12);
+    REQUIRE(ArrayView2D(a.data(), 3, 4).contiguous());
+    REQUIRE_FALSE(ArrayView2D(a.data(), 3, 2, 2).contiguous());
+    REQUIRE(ArrayView2D(a.data(), 1, 2, 2).contiguous());
+}
