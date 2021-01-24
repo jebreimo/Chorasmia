@@ -84,7 +84,7 @@ namespace Chorasmia
         [[nodiscard]]
         constexpr bool contiguous() const noexcept
         {
-            return m_RowGap == 0;
+            return m_RowGap == 0 || m_RowCount <= 1;
         }
 
         [[nodiscard]]
