@@ -6,7 +6,7 @@
 # License text is included with the source distribution.
 # ===========================================================================
 cmake_minimum_required(VERSION 3.16)
-project(Chorasmia VERSION 0.1.2)
+project(Chorasmia VERSION 0.1.3)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -21,6 +21,9 @@ endif ()
 
 # Test option
 option(CHORASMIA_BUILD_TEST "Build tests" ${CHORASMIA_MASTER_PROJECT})
+
+# Install option
+option(CHORASMIA_INSTALL "Generate the install target" ${CHORASMIA_MASTER_PROJECT})
 
 include(GNUInstallDirs)
 
@@ -40,6 +43,38 @@ export(TARGETS Chorasmia
 
 if (CHORASMIA_BUILD_TEST)
     enable_testing()
-
     add_subdirectory(tests/ChorasmiaTest)
+endif ()
+
+if (CHORASMIA_INSTALL)
+    install(TARGETS Chorasmia
+        EXPORT ChorasmiaConfig
+        )
+
+    install(EXPORT ChorasmiaConfig
+        FILE
+            ChorasmiaConfig.cmake
+        NAMESPACE
+            Chorasmia::
+        DESTINATION
+            ${CMAKE_INSTALL_LIBDIR}/cmake/Chorasmia
+        )
+
+    install(
+        DIRECTORY
+            include/Chorasmia
+        DESTINATION
+            ${CMAKE_INSTALL_INCLUDEDIR}
+    )
+
+    include(CMakePackageConfigHelpers)
+
+    write_basic_package_version_file(ChorasmiaConfigVersion.cmake
+        COMPATIBILITY SameMajorVersion
+        )
+
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ChorasmiaConfigVersion.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/Chorasmia
+        )
+
 endif ()
