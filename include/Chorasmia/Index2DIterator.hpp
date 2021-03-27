@@ -14,7 +14,7 @@ namespace Chorasmia
     class BasicIndex2DIterator
     {
     public:
-        BasicIndex2DIterator(size_t rows, size_t columns)
+        constexpr BasicIndex2DIterator(size_t rows, size_t columns)
             : m_Rows(rows),
               m_Columns(columns)
         {}
@@ -46,7 +46,6 @@ namespace Chorasmia
         {
             return m_Columns;
         }
-
     private:
         size_t m_Row = 0;
         size_t m_Col = SIZE_MAX;
@@ -93,13 +92,14 @@ namespace Chorasmia
     class Index2DIterator
     {
     public:
-        Index2DIterator(size_t rows, size_t columns,
-                        MatrixTraversal direction)
+        constexpr Index2DIterator(
+            size_t rows,
+            size_t columns,
+            MatrixTraversal direction = MatrixTraversal::RIGHT_DOWN)
             : m_It(isRowMajor(direction) ? rows : columns,
                    isRowMajor(direction) ? columns : rows),
               m_Direction(direction)
-        {
-        }
+        {}
 
         std::optional<Index2D> next()
         {
