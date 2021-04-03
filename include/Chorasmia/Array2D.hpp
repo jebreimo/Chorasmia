@@ -93,6 +93,12 @@ namespace Chorasmia
         }
 
         [[nodiscard]]
+        size_t size() const noexcept
+        {
+            return m_Buffer.size();
+        }
+
+        [[nodiscard]]
         ArrayView<T> array() const
         {
             return ArrayView<T>(data(), valueCount());
@@ -228,8 +234,7 @@ namespace Chorasmia
         }
 
         [[nodiscard]]
-        friend bool
-        operator==(const Array2D& a, const Array2D& b)
+        friend bool operator==(const Array2D& a, const Array2D& b)
         {
             return a.rowCount() == b.rowCount()
                    && a.columnCount() == b.columnCount()
@@ -237,10 +242,27 @@ namespace Chorasmia
         }
 
         [[nodiscard]]
-        friend bool
-        operator!=(const Array2D& a, const Array2D& b)
+        friend bool operator!=(const Array2D& a, const Array2D& b)
         {
             return !(a == b);
+        }
+
+        [[nodiscard]]
+        friend const T* data(const Array2D& a)
+        {
+            return a.data();
+        }
+
+        [[nodiscard]]
+        friend T* data(Array2D& a)
+        {
+            return a.data();
+        }
+
+        [[nodiscard]]
+        friend size_t size(const Array2D& a)
+        {
+            return a.size();
         }
     private:
         std::vector<T> m_Buffer;
