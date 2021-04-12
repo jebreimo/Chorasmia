@@ -56,6 +56,7 @@ TEST_CASE("Test Index2DIterator")
 {
     using namespace Chorasmia;
     Index2DIterator it(2, 3, MatrixTraversal::DOWN_LEFT);
+    REQUIRE(it.dimensions() == std::pair<size_t, size_t>(3, 2));
     auto idx = it.next();
     REQUIRE(idx);
     REQUIRE(idx == Index2D{0, 2});

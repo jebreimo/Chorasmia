@@ -130,6 +130,11 @@ namespace Chorasmia
             }
         }
 
+        [[nodiscard]]
+        std::pair<size_t, size_t> dimensions() const
+        {
+            return {m_It.rows(), m_It.columns()};
+        }
     private:
         BasicIndex2DIterator m_It;
         MatrixTraversal m_Direction;
