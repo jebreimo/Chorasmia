@@ -77,4 +77,9 @@ TEST_CASE("Test Index2DIterator")
     REQUIRE(idx == Index2D{1, 0});
     REQUIRE_FALSE(it.next());
     REQUIRE_FALSE(it.next());
+
+    it.reset();
+    idx = it.next();
+    REQUIRE(idx);
+    REQUIRE(idx == Index2D{0, 2});
 }

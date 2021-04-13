@@ -46,6 +46,12 @@ namespace Chorasmia
         {
             return m_Columns;
         }
+
+        void reset()
+        {
+            m_Row = 0;
+            m_Col = SIZE_MAX;
+        }
     private:
         size_t m_Row = 0;
         size_t m_Col = SIZE_MAX;
@@ -101,6 +107,12 @@ namespace Chorasmia
               m_Direction(direction)
         {}
 
+        [[nodiscard]]
+        std::pair<size_t, size_t> dimensions() const
+        {
+            return {m_It.rows(), m_It.columns()};
+        }
+
         std::optional<Index2D> next()
         {
             const auto index = m_It.next();
@@ -130,10 +142,9 @@ namespace Chorasmia
             }
         }
 
-        [[nodiscard]]
-        std::pair<size_t, size_t> dimensions() const
+        void reset()
         {
-            return {m_It.rows(), m_It.columns()};
+            m_It.reset();
         }
     private:
         BasicIndex2DIterator m_It;
