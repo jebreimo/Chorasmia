@@ -53,6 +53,18 @@ namespace Chorasmia
         }
 
         [[nodiscard]]
+        const T& operator()(std::pair<size_t, size_t> pos) const noexcept
+        {
+            return operator()(pos.first, pos.second);
+        }
+
+        [[nodiscard]]
+        T& operator()(std::pair<size_t, size_t> pos) noexcept
+        {
+            return operator()(pos.first, pos.second);
+        }
+
+        [[nodiscard]]
         constexpr ArrayView<T> operator[](size_t row) const noexcept
         {
             return {data() + row * rowSize(), columnCount()};
@@ -132,6 +144,12 @@ namespace Chorasmia
                     nrows,
                     ncolumns,
                     m_RowGap + columnCount() - ncolumns};
+        }
+
+        [[nodiscard]]
+        constexpr std::pair<size_t, size_t> dimensions() const noexcept
+        {
+            return {m_RowCount, m_ColumnCount};
         }
 
         [[nodiscard]]

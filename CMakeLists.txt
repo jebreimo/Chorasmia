@@ -6,7 +6,7 @@
 # License text is included with the source distribution.
 # ===========================================================================
 cmake_minimum_required(VERSION 3.16)
-project(Chorasmia VERSION 0.1.9.3)
+project(Chorasmia VERSION 0.1.9.4)
 
 set(CMAKE_CXX_STANDARD 17)
 

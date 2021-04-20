@@ -14,7 +14,7 @@ TEST_CASE("Test copy")
     using namespace Chorasmia;
     Array2D<int> a({1, 2, 3, 4, 5, 6}, 2, 3);
     Array2D<int> b(3, 2);
-    copy<int>(a, MatrixTraversal::UP_LEFT, b.data());
+    copy<int>(a, MatrixPath::UP_LEFT, b.data());
     REQUIRE(b(0, 0) == 6);
     REQUIRE(b(0, 1) == 3);
     REQUIRE(b(1, 0) == 5);

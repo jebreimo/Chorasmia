@@ -7,7 +7,7 @@
 //****************************************************************************
 #pragma once
 #include "ArrayView2D.hpp"
-#include "Index2DIterator.hpp"
+#include "MatrixPath.hpp"
 
 namespace Chorasmia
 {
@@ -36,25 +36,31 @@ namespace Chorasmia
     }
 
     template <typename T, typename OutIt>
-    OutIt copy(const ArrayView2D<T>& arr, MatrixTraversal dir, OutIt out)
+    OutIt copy(const ArrayView2D<T>& arr, MatrixPath path, OutIt out)
     {
-        Index2DIterator trav(arr.rowCount(), arr.columnCount(), dir);
-        while (const auto idx = trav.next())
+        const auto [m, n] = mapSize(arr.dimensions(), path);
+        for (size_t i = 0; i < m; ++i)
         {
-            *out++ = arr(idx->row, idx->column);
+            for (size_t j = 0; j < n; ++j)
+            {
+                *out++ = arr(getFromIndex({m, n}, i, j, path));
+            }
         }
         return out;
     }
 
     template <typename T, typename UnaryFunc>
     UnaryFunc
-    forEach(const ArrayView2D<T>& arr, MatrixTraversal dir, UnaryFunc f)
+    forEach(const ArrayView2D<T>& arr, MatrixPath path, UnaryFunc&& f)
     {
-        Index2DIterator trav(arr.rowCount(), arr.columnCount(), dir);
-        while (const auto idx = trav.next())
+        auto[m, n] = mapSize(arr.dimensions(), path);
+        for (size_t i = 0; i < m; ++i)
         {
-            f(arr(idx->row, idx->column));
+            for (size_t j = 0; j < n; ++j)
+            {
+                f(arr(getFromIndex(arr.dimensions(), i, j, path)));
+            }
         }
-        return f;
+        return std::forward<UnaryFunc>(f);
     }
 }
