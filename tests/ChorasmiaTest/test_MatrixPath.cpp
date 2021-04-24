@@ -31,6 +31,9 @@ TEST_CASE("Test Index2DIterator")
 {
     using namespace Chorasmia;
     using id = std::pair<size_t, size_t>;
-    REQUIRE(getFromIndex({4, 5}, 1, 3, MatrixPath::UP_RIGHT) == id(1, 1));
-    REQUIRE(getFromIndex({4, 5}, 1, 3, MatrixPath::UP_LEFT) == id(1, 2));
+    MatrixIndexMapping urMapping({5, 4}, MatrixPath::UP_RIGHT);
+    REQUIRE(urMapping.getFromIndices(1, 3) == id(1, 1));
+    REQUIRE(urMapping.getToIndices(1, 1) == id(1, 3));
+    MatrixIndexMapping ulMapping({5, 4}, MatrixPath::UP_LEFT);
+    REQUIRE(ulMapping.getFromIndices(1, 3) == id(1, 2));
  }

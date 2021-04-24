@@ -38,12 +38,13 @@ namespace Chorasmia
     template <typename T, typename OutIt>
     OutIt copy(const ArrayView2D<T>& arr, MatrixPath path, OutIt out)
     {
-        const auto [m, n] = mapSize(arr.dimensions(), path);
+        MatrixIndexMapping mapping(arr.dimensions(), path);
+        const auto [m, n] = mapping.getToSize();
         for (size_t i = 0; i < m; ++i)
         {
             for (size_t j = 0; j < n; ++j)
             {
-                *out++ = arr(getFromIndex({m, n}, i, j, path));
+                *out++ = arr(mapping.getFromIndices(i, j));
             }
         }
         return out;
@@ -53,12 +54,13 @@ namespace Chorasmia
     UnaryFunc
     forEach(const ArrayView2D<T>& arr, MatrixPath path, UnaryFunc&& f)
     {
-        auto[m, n] = mapSize(arr.dimensions(), path);
+        MatrixIndexMapping mapping(arr.dimensions(), path);
+        const auto[m, n] = mapping.getToSize();
         for (size_t i = 0; i < m; ++i)
         {
             for (size_t j = 0; j < n; ++j)
             {
-                f(arr(getFromIndex(arr.dimensions(), i, j, path)));
+                f(arr(mapping.getFromIndices(i, j)));
             }
         }
         return std::forward<UnaryFunc>(f);

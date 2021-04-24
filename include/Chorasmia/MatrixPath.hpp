@@ -54,68 +54,80 @@ namespace Chorasmia
         return MatrixPath(newAngle | transposed);
     }
 
-    template <MatrixPath method>
-    constexpr std::pair<size_t, size_t>
-    mapSize(std::pair<size_t, size_t> size)
+    class MatrixIndexMapping
     {
-        if constexpr (isRowMajor(method))
-            return size;
-        else
-            return {size.second, size.first};
-    }
+    public:
+        constexpr MatrixIndexMapping(
+            const std::pair<size_t, size_t>& fromSize,
+            MatrixPath path)
+            : m_FromSize(fromSize),
+              m_Path(path)
+        {}
 
-    constexpr std::pair<size_t, size_t>
-    mapSize(std::pair<size_t, size_t> size, MatrixPath method)
-    {
-        if (isRowMajor(method))
-            return size;
-        else
-            return {size.second, size.first};
-    }
-
-    //template <MatrixPath method>
-    //constexpr std::pair<size_t, size_t>
-    //getFromIndex(const std::pair<size_t, size_t>& size, size_t i, size_t j)
-    //{
-    //    if constexpr (method == MatrixPath::UP_RIGHT)
-    //        return {size.second - 1 - j, i};
-    //    if constexpr (method == MatrixPath::LEFT_UP)
-    //        return {size.first - 1 - i, size.second - j};
-    //    if constexpr (method == MatrixPath::DOWN_LEFT)
-    //        return {j, size.first - i};
-    //    if constexpr (method == MatrixPath::DOWN_RIGHT)
-    //        return {j, i};
-    //    if constexpr (method == MatrixPath::RIGHT_UP)
-    //        return {size.first - 1 - i, j};
-    //    if constexpr (method == MatrixPath::UP_LEFT)
-    //        return {size.second - 1 - j, size.first - 1 - i};
-    //    if constexpr (method == MatrixPath::LEFT_DOWN)
-    //        return {i, size.second - 1 - j};
-    //    return {i, j};
-    //};
-
-    constexpr std::pair<size_t, size_t>
-    getFromIndex(const std::pair<size_t, size_t>& size, size_t i, size_t j,
-                 MatrixPath path)
-    {
-        switch (path)
+        [[nodiscard]]
+        constexpr std::pair<size_t, size_t> getFromIndices(size_t i, size_t j) const
         {
-        case MatrixPath::RIGHT_DOWN:
-            return {i, j};
-        case MatrixPath::UP_RIGHT:
-            return {size.second - 1 - j, i};
-        case MatrixPath::LEFT_UP:
-            return {size.first - 1 - i, size.second - j};
-        case MatrixPath::DOWN_LEFT:
-            return {j, size.first - i};
-        case MatrixPath::DOWN_RIGHT:
-            return {j, i};
-        case MatrixPath::RIGHT_UP:
-            return {size.first - 1 - i, j};
-        case MatrixPath::UP_LEFT:
-            return {size.second - 1 - j, size.first - 1 - i};
-        case MatrixPath::LEFT_DOWN:
-            return {i, size.second - 1 - j};
+            switch (m_Path)
+            {
+            case MatrixPath::RIGHT_DOWN:
+                return {i, j};
+            case MatrixPath::UP_RIGHT:
+                return {m_FromSize.first - 1 - j, i};
+            case MatrixPath::LEFT_UP:
+                return {m_FromSize.second - 1 - i, m_FromSize.first - 1 - j};
+            case MatrixPath::DOWN_LEFT:
+                return {j, m_FromSize.second - 1 - i};
+            case MatrixPath::DOWN_RIGHT:
+                return {j, i};
+            case MatrixPath::RIGHT_UP:
+                return {m_FromSize.second - 1 - i, j};
+            case MatrixPath::UP_LEFT:
+                return {m_FromSize.first - 1 - j, m_FromSize.second - 1 - i};
+            case MatrixPath::LEFT_DOWN:
+                return {i, m_FromSize.first - 1 - j};
+            }
         }
-    }
+
+        [[nodiscard]]
+        constexpr std::pair<size_t, size_t> getToIndices(size_t i, size_t j) const
+        {
+            switch (m_Path)
+            {
+            case MatrixPath::RIGHT_DOWN:
+                return {i, j};
+            case MatrixPath::UP_RIGHT:
+                return {j, m_FromSize.first - 1 - i};
+            case MatrixPath::LEFT_UP:
+                return {m_FromSize.first - 1 - i, m_FromSize.second - 1 - j};
+            case MatrixPath::DOWN_LEFT:
+                return {m_FromSize.second - 1 - j, i};
+            case MatrixPath::DOWN_RIGHT:
+                return {j, i};
+            case MatrixPath::RIGHT_UP:
+                return {i, m_FromSize.second - 1 - j};
+            case MatrixPath::UP_LEFT:
+                return {m_FromSize.second - 1 - j, m_FromSize.first - 1 - i};
+            case MatrixPath::LEFT_DOWN:
+                return {m_FromSize.first - 1 - i, j};
+            }
+        }
+
+        [[nodiscard]]
+        constexpr std::pair<size_t, size_t> getFromSize() const
+        {
+            return m_FromSize;
+        }
+
+        [[nodiscard]]
+        constexpr std::pair<size_t, size_t> getToSize() const
+        {
+            if (isRowMajor(m_Path))
+                return m_FromSize;
+            else
+                return {m_FromSize.second, m_FromSize.first};
+        }
+    private:
+        std::pair<size_t, size_t> m_FromSize;
+        MatrixPath m_Path;
+    };
 }
