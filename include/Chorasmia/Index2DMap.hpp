@@ -10,43 +10,43 @@
 
 namespace Chorasmia
 {
-    enum class MatrixPath
+    enum class Index2DMode
     {
-        RIGHT_DOWN, /// The normal (row-wise) matrix traversal
-        LEFT_DOWN,
-        RIGHT_UP,
-        LEFT_UP,
-        DOWN_RIGHT, /// Transposed (column-wise) matrix traversal
-        DOWN_LEFT,
-        UP_RIGHT,
-        UP_LEFT
+        ROWS, /// The normal (row-wise) matrix traversal
+        REVERSED_ROWS,
+        ROWS_REVERSED_ORDER,
+        REVERSED_ROWS_REVERSED_ORDER,
+        COLUMNS, /// Transposed (column-wise) matrix traversal
+        COLUMNS_REVERSED_ORDER,
+        REVERSED_COLUMNS,
+        REVERSED_COLUMNS_REVERSED_ORDER
     };
 
-    constexpr bool isTransposed(MatrixPath path)
+    constexpr bool isTransposed(Index2DMode path)
     {
         return (0b10010110u & (1u << unsigned(path))) != 0;
     }
 
-    constexpr bool isRowMajor(MatrixPath path)
+    constexpr bool isRowMajor(Index2DMode path)
     {
         return unsigned(path) < 4;
     }
 
-    constexpr MatrixPath transpose(MatrixPath path)
+    constexpr Index2DMode transpose(Index2DMode path)
     {
-        return MatrixPath(unsigned(path) ^ 4u);
+        return Index2DMode(unsigned(path) ^ 4u);
     }
 
-    constexpr MatrixPath invert(MatrixPath path)
+    constexpr Index2DMode invert(Index2DMode path)
     {
         if ((unsigned(path) + 1u & 0b110u) != 0b110)
             return path;
         else
-            return MatrixPath(unsigned(path) ^ 0b11u);
+            return Index2DMode(unsigned(path) ^ 0b11u);
     }
 
-    constexpr MatrixPath
-    rotateLeft(MatrixPath path, int turns)
+    constexpr Index2DMode
+    rotateLeft(Index2DMode path, int turns)
     {
         unsigned mask = 0;
         unsigned b = unsigned(path) & 4u;
@@ -61,15 +61,15 @@ namespace Chorasmia
         case 3: mask = (4u | ((b >> 1u) ^ 2u) | (b >> 2u)); break;
         }
 
-        return MatrixPath(unsigned(path) ^ mask);
+        return Index2DMode(unsigned(path) ^ mask);
     }
 
-    class MatrixIndexMapping
+    class Index2DMap
     {
     public:
-        constexpr MatrixIndexMapping(
+        constexpr Index2DMap(
             std::pair<size_t, size_t> fromSize,
-            MatrixPath path)
+            Index2DMode path)
             : m_FromSize(std::move(fromSize)),
               m_Path(path),
               m_InversePath(invert(path))
@@ -126,7 +126,7 @@ namespace Chorasmia
 
     private:
         std::pair<size_t, size_t> m_FromSize;
-        MatrixPath m_Path;
-        MatrixPath m_InversePath;
+        Index2DMode m_Path;
+        Index2DMode m_InversePath;
     };
 }

@@ -7,7 +7,7 @@
 //****************************************************************************
 #pragma once
 #include "ArrayView2D.hpp"
-#include "MatrixPath.hpp"
+#include "Index2DMap.hpp"
 
 namespace Chorasmia
 {
@@ -36,9 +36,9 @@ namespace Chorasmia
     }
 
     template <typename T, typename OutIt>
-    OutIt copy(const ArrayView2D<T>& arr, MatrixPath path, OutIt out)
+    OutIt copy(const ArrayView2D<T>& arr, Index2DMode path, OutIt out)
     {
-        MatrixIndexMapping mapping(arr.dimensions(), path);
+        Index2DMap mapping(arr.dimensions(), path);
         const auto [m, n] = mapping.getToSize();
         for (size_t i = 0; i < m; ++i)
         {
@@ -48,21 +48,5 @@ namespace Chorasmia
             }
         }
         return out;
-    }
-
-    template <typename T, typename UnaryFunc>
-    UnaryFunc
-    forEach(const ArrayView2D<T>& arr, MatrixPath path, UnaryFunc&& f)
-    {
-        MatrixIndexMapping mapping(arr.dimensions(), path);
-        const auto[m, n] = mapping.getToSize();
-        for (size_t i = 0; i < m; ++i)
-        {
-            for (size_t j = 0; j < n; ++j)
-            {
-                f(arr(mapping.getFromIndices(i, j)));
-            }
-        }
-        return std::forward<UnaryFunc>(f);
     }
 }

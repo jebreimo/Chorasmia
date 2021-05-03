@@ -20,8 +20,8 @@ add_executable(ChorasmiaTest
     test_Array2D.cpp
     test_ArrayView2D.cpp
     test_ArrayView2DAlgorithms.cpp
+    test_Index2DMap.cpp
     test_IntervalMap.cpp
-    test_MatrixPath.cpp
     test_MutableArrayView2D.cpp
     )
 
