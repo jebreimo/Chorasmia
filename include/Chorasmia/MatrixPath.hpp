@@ -13,23 +13,23 @@ namespace Chorasmia
     enum class MatrixPath
     {
         RIGHT_DOWN, /// The normal (row-wise) matrix traversal
-        UP_RIGHT,
-        LEFT_UP,
-        DOWN_LEFT,
-        DOWN_RIGHT, /// Transposed (column-wise) matrix traversal
+        LEFT_DOWN,
         RIGHT_UP,
-        UP_LEFT,
-        LEFT_DOWN
+        LEFT_UP,
+        DOWN_RIGHT, /// Transposed (column-wise) matrix traversal
+        DOWN_LEFT,
+        UP_RIGHT,
+        UP_LEFT
     };
 
     constexpr bool isTransposed(MatrixPath path)
     {
-        return unsigned(path) > unsigned(MatrixPath::DOWN_RIGHT);
+        return (0b10010110u & (1u << unsigned(path))) != 0;
     }
 
     constexpr bool isRowMajor(MatrixPath path)
     {
-        return isTransposed(path) == (unsigned(path) % 2 != 0);
+        return unsigned(path) < 4;
     }
 
     constexpr MatrixPath transpose(MatrixPath path)
@@ -39,76 +39,73 @@ namespace Chorasmia
 
     constexpr MatrixPath invert(MatrixPath path)
     {
-        if (unsigned(path) & 1)
-            return MatrixPath(unsigned(path) ^ 2u);
-        else
+        if ((unsigned(path) + 1u & 0b110u) != 0b110)
             return path;
+        else
+            return MatrixPath(unsigned(path) ^ 0b11u);
     }
 
     constexpr MatrixPath
     rotateLeft(MatrixPath path, int turns)
     {
-        const auto transposed = unsigned(path) & 4u;
-        const auto angle = int(unsigned(path) & 3u);
-        const auto newAngle = unsigned(angle + turns) & 3u;
-        return MatrixPath(newAngle | transposed);
+        unsigned mask = 0;
+        unsigned b = unsigned(path) & 4u;
+        if (turns < 0)
+            turns = 4 - (-turns % 4);
+
+        switch (turns % 4)
+        {
+        default: break;
+        case 1: mask = (4u | (b >> 1u) | ((b >> 2u) ^ 1u)); break;
+        case 2: mask = 3; break;
+        case 3: mask = (4u | ((b >> 1u) ^ 2u) | (b >> 2u)); break;
+        }
+
+        return MatrixPath(unsigned(path) ^ mask);
     }
 
     class MatrixIndexMapping
     {
     public:
         constexpr MatrixIndexMapping(
-            const std::pair<size_t, size_t>& fromSize,
+            std::pair<size_t, size_t> fromSize,
             MatrixPath path)
-            : m_FromSize(fromSize),
-              m_Path(path)
+            : m_FromSize(std::move(fromSize)),
+              m_Path(path),
+              m_InversePath(invert(path))
         {}
 
         [[nodiscard]]
-        constexpr std::pair<size_t, size_t> getFromIndices(size_t i, size_t j) const
+        constexpr std::pair<size_t, size_t>
+        getFromIndices(size_t i, size_t j) const
         {
-            switch (m_Path)
+            auto u = unsigned(m_InversePath);
+            if (isRowMajor(m_InversePath))
             {
-            case MatrixPath::RIGHT_DOWN:
-                return {i, j};
-            case MatrixPath::UP_RIGHT:
-                return {m_FromSize.first - 1 - j, i};
-            case MatrixPath::LEFT_UP:
-                return {m_FromSize.second - 1 - i, m_FromSize.first - 1 - j};
-            case MatrixPath::DOWN_LEFT:
-                return {j, m_FromSize.second - 1 - i};
-            case MatrixPath::DOWN_RIGHT:
-                return {j, i};
-            case MatrixPath::RIGHT_UP:
-                return {m_FromSize.second - 1 - i, j};
-            case MatrixPath::UP_LEFT:
-                return {m_FromSize.first - 1 - j, m_FromSize.second - 1 - i};
-            case MatrixPath::LEFT_DOWN:
-                return {i, m_FromSize.first - 1 - j};
+                return {(u & 0b10u) ? m_FromSize.first - 1 - i : i,
+                        (u & 1u) ? m_FromSize.second - 1 - j : j};
+            }
+            else
+            {
+                return {(u & 1u) ? m_FromSize.first - 1 - j : j,
+                        (u & 0b10u) ? m_FromSize.second - 1 - i : i};
             }
         }
 
         [[nodiscard]]
-        constexpr std::pair<size_t, size_t> getToIndices(size_t i, size_t j) const
+        constexpr std::pair<size_t, size_t>
+        getToIndices(size_t i, size_t j) const
         {
-            switch (m_Path)
+            auto u = unsigned(m_Path);
+            if (isRowMajor(m_Path))
             {
-            case MatrixPath::RIGHT_DOWN:
-                return {i, j};
-            case MatrixPath::UP_RIGHT:
-                return {j, m_FromSize.first - 1 - i};
-            case MatrixPath::LEFT_UP:
-                return {m_FromSize.first - 1 - i, m_FromSize.second - 1 - j};
-            case MatrixPath::DOWN_LEFT:
-                return {m_FromSize.second - 1 - j, i};
-            case MatrixPath::DOWN_RIGHT:
-                return {j, i};
-            case MatrixPath::RIGHT_UP:
-                return {i, m_FromSize.second - 1 - j};
-            case MatrixPath::UP_LEFT:
-                return {m_FromSize.second - 1 - j, m_FromSize.first - 1 - i};
-            case MatrixPath::LEFT_DOWN:
-                return {m_FromSize.first - 1 - i, j};
+                return {(u & 0b10u) ? m_FromSize.first - 1 - i : i,
+                        (u & 1u) ? m_FromSize.second - 1 - j : j};
+            }
+            else
+            {
+                return {(u & 1u) ? m_FromSize.second - 1 - j : j,
+                        (u & 0b10u) ? m_FromSize.first - 1 - i : i};
             }
         }
 
@@ -126,8 +123,10 @@ namespace Chorasmia
             else
                 return {m_FromSize.second, m_FromSize.first};
         }
+
     private:
         std::pair<size_t, size_t> m_FromSize;
         MatrixPath m_Path;
+        MatrixPath m_InversePath;
     };
 }
