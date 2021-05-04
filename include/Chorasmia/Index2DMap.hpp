@@ -45,8 +45,7 @@ namespace Chorasmia
             return Index2DMode(unsigned(path) ^ 0b11u);
     }
 
-    constexpr Index2DMode
-    rotateLeft(Index2DMode path, int turns)
+    constexpr Index2DMode rotateCcw(Index2DMode path, int turns)
     {
         unsigned mask = 0;
         unsigned b = unsigned(path) & 4u;
