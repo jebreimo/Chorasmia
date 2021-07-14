@@ -12,6 +12,9 @@ TEST_CASE("Approx comparisons")
 {
     Chorasmia::Approx<double> a(1, 0.01);
 
+    REQUIRE(a == 1);
+    REQUIRE(1 == a);
+
     REQUIRE(a == 0.991);
     REQUIRE_FALSE(a == 0.989);
 
