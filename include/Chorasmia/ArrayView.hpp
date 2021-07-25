@@ -52,6 +52,12 @@ namespace Chorasmia
             return m_Data;
         }
 
+        constexpr ArrayView<T>
+        subarray(size_t offset, size_t length = SIZE_MAX) const noexcept
+        {
+            return {m_Data + offset, std::min(m_Size - offset, length)};
+        }
+
         [[nodiscard]]
         friend bool operator==(const ArrayView& a, const ArrayView& b)
         {

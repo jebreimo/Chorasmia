@@ -57,6 +57,17 @@ namespace Chorasmia
             return m_Data;
         }
 
+        constexpr ArrayView<T> immutable() const noexcept
+        {
+            return ArrayView<T>(m_Data, m_Size);
+        }
+
+        constexpr MutableArrayView<T>
+        subarray(size_t offset, size_t length = SIZE_MAX) const noexcept
+        {
+            return {m_Data + offset, std::min(m_Size - offset, length)};
+        }
+
         [[nodiscard]]
         friend bool operator==(const MutableArrayView& a,
                                const MutableArrayView& b)

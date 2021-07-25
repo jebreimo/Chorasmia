@@ -77,15 +77,13 @@ namespace Chorasmia
         }
 
         [[nodiscard]]
-        ArrayView<T> array() const
+        constexpr ArrayView2D<T> immutable() const noexcept
         {
-            if (!contiguous())
-                CHORASMIA_THROW("Can not create ArrayView from non-contiguous MutableArrayView2D.");
-            return ArrayView<T>(data(), valueCount());
+            return {data(), rowCount(), columnCount(), m_RowGap};
         }
 
         [[nodiscard]]
-        MutableArrayView<T> array()
+        MutableArrayView<T> array() const
         {
             if (!contiguous())
                 CHORASMIA_THROW("Can not create MutableArrayView from non-contiguous MutableArrayView2D.");
