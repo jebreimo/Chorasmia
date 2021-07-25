@@ -28,37 +28,19 @@ namespace Chorasmia
         }
 
         [[nodiscard]]
-        T& operator[](size_t i)
+        constexpr T& operator[](size_t i) const
         {
             return m_Data[i];
         }
 
         [[nodiscard]]
-        const T& operator[](size_t i) const
-        {
-            return m_Data[i];
-        }
-
-        [[nodiscard]]
-        const T* begin() const
+        constexpr T* begin() const
         {
             return m_Data;
         }
 
         [[nodiscard]]
-        T* begin()
-        {
-            return m_Data;
-        }
-
-        [[nodiscard]]
-        const T* end() const
-        {
-            return m_Data + m_Size;
-        }
-
-        [[nodiscard]]
-        T* end()
+        constexpr T* end() const
         {
             return m_Data + m_Size;
         }
@@ -70,13 +52,7 @@ namespace Chorasmia
         }
 
         [[nodiscard]]
-        T* data()
-        {
-            return m_Data;
-        }
-
-        [[nodiscard]]
-        const T* data() const
+        constexpr T* data() const
         {
             return m_Data;
         }

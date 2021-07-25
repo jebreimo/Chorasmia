@@ -6,7 +6,7 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #pragma once
-#include "ArrayView2D.hpp"
+#include "MutableArrayView2D.hpp"
 #include "Index2DMap.hpp"
 
 namespace Chorasmia
@@ -35,18 +35,21 @@ namespace Chorasmia
         return {min, max};
     }
 
-    template <typename T, typename OutIt>
-    OutIt copy(const ArrayView2D<T>& arr, Index2DMode path, OutIt out)
+    template <typename T>
+    void copy(const ArrayView2D<T>& src,
+              const MutableArrayView2D<T>& dst,
+              Index2DMode path)
     {
-        Index2DMap mapping(arr.dimensions(), path);
-        const auto [m, n] = mapping.getToSize();
+        Index2DMap mapping(src.dimensions(), path);
+        if (mapping.getToSize() != dst.dimensions())
+            CHORASMIA_THROW("dst has incorrect dimensions.");
+        const auto[m, n] = mapping.getToSize();
         for (size_t i = 0; i < m; ++i)
         {
             for (size_t j = 0; j < n; ++j)
             {
-                *out++ = arr(mapping.getFromIndices(i, j));
+                dst(i, j) = src(mapping.getFromIndices(i, j));
             }
         }
-        return out;
     }
 }

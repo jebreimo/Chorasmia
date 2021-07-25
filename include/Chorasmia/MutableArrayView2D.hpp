@@ -41,49 +41,25 @@ namespace Chorasmia
         }
 
         [[nodiscard]]
-        const T& operator()(size_t row, size_t column) const noexcept
+        T& operator()(size_t row, size_t column) const noexcept
         {
             return m_Data[row * rowSize() + column];
         }
 
         [[nodiscard]]
-        T& operator()(size_t row, size_t column) noexcept
-        {
-            return m_Data[row * rowSize() + column];
-        }
-
-        [[nodiscard]]
-        const T& operator()(std::pair<size_t, size_t> pos) const noexcept
+        T& operator()(std::pair<size_t, size_t> pos) const noexcept
         {
             return operator()(pos.first, pos.second);
         }
 
         [[nodiscard]]
-        T& operator()(std::pair<size_t, size_t> pos) noexcept
-        {
-            return operator()(pos.first, pos.second);
-        }
-
-        [[nodiscard]]
-        constexpr ArrayView<T> operator[](size_t row) const noexcept
+        constexpr MutableArrayView<T> operator[](size_t row) const noexcept
         {
             return {data() + row * rowSize(), columnCount()};
         }
 
         [[nodiscard]]
-        constexpr MutableArrayView<T> operator[](size_t row) noexcept
-        {
-            return {data() + row * rowSize(), columnCount()};
-        }
-
-        [[nodiscard]]
-        constexpr const T* data() const noexcept
-        {
-            return m_Data;
-        }
-
-        [[nodiscard]]
-        constexpr T* data() noexcept
+        constexpr T* data() const noexcept
         {
             return m_Data;
         }
@@ -117,24 +93,9 @@ namespace Chorasmia
         }
 
         [[nodiscard]]
-        ArrayView2D<T> subarray(size_t row, size_t column,
-                                size_t nrows = SIZE_MAX,
-                                size_t ncolumns = SIZE_MAX) const
-        {
-            row = std::min(row, rowCount());
-            column = std::min(column, columnCount());
-            nrows = std::min(nrows, rowCount() - row);
-            ncolumns = std::min(ncolumns, columnCount() - column);
-            return {data() + row * rowSize() + column,
-                    nrows,
-                    ncolumns,
-                    m_RowGap + columnCount() - ncolumns};
-        }
-
-        [[nodiscard]]
         MutableArrayView2D<T> subarray(size_t row, size_t column,
                                        size_t nrows = SIZE_MAX,
-                                       size_t ncolumns = SIZE_MAX)
+                                       size_t ncolumns = SIZE_MAX) const
         {
             row = std::min(row, rowCount());
             column = std::min(column, columnCount());
@@ -171,29 +132,16 @@ namespace Chorasmia
         }
 
         [[nodiscard]]
-        MutableIterator begin() noexcept
+        MutableIterator begin() const noexcept
         {
             return MutableIterator({m_Data, columnCount()}, m_RowGap);
         }
 
         [[nodiscard]]
-        ConstIterator begin() const noexcept
-        {
-            return ConstIterator({m_Data, columnCount()}, m_RowGap);
-        }
-
-        [[nodiscard]]
-        MutableIterator end() noexcept
+        MutableIterator end() const noexcept
         {
             return MutableIterator({m_Data + rowCount() * rowSize(), columnCount()},
                                    m_RowGap);
-        }
-
-        [[nodiscard]]
-        ConstIterator end() const noexcept
-        {
-            return ConstIterator({m_Data + rowCount() * rowSize(), columnCount()},
-                                 m_RowGap);
         }
 
         [[nodiscard]]
