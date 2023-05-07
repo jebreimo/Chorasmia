@@ -23,7 +23,7 @@ add_executable(ChorasmiaTest
     test_Index2DMap.cpp
     test_IntervalMap.cpp
     test_MutableArrayView2D.cpp
-    )
+    test_RingBuffer.cpp)
 
 target_link_libraries(ChorasmiaTest
     PRIVATE
