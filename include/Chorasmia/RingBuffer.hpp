@@ -83,10 +83,8 @@ namespace Chorasmia
         }
 
         [[nodiscard]]
-        friend RingBufferIterator operator+(RingBufferIterator it, ptrdiff_t n)
+        friend RingBufferIterator operator+(RingBufferIterator it, size_t n)
         {
-            if (n < 0)
-                return it - (-n);
             auto distance = std::distance(it.first_, it.current_);
             auto offset = n < (N  + 1 - distance) ? distance + n
                                                   : n - (N + 1 - distance);
@@ -94,10 +92,8 @@ namespace Chorasmia
         }
 
         [[nodiscard]]
-        friend RingBufferIterator operator-(RingBufferIterator it, ptrdiff_t n)
+        friend RingBufferIterator operator-(RingBufferIterator it, size_t n)
         {
-            if (n < 0)
-                return it + (-n);
             auto distance = std::distance(it.first_, it.current_);
             auto offset = n <= distance ? distance - n
                                         : N + 1 - (n - distance);
