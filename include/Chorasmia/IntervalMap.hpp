@@ -46,21 +46,18 @@ namespace Chorasmia
 
         void insert(Key key, Value value)
         {
-            using std::move;
             auto pos = findImpl(key);
             if (m_Map[pos].first == Approx<Key>(key))
             {
-                m_Map[pos].second = move(value);
+                m_Map[pos].second = std::move(value);
                 return;
             }
 
-            m_Map.insert(m_Map.begin() + pos + 1, {key, move(value)});
+            m_Map.insert(m_Map.begin() + pos + 1, {key, std::move(value)});
         }
 
         void insert(Key from, Key to, Value value)
         {
-            using std::move;
-
             if (from > to)
                 std::swap(from, to);
             else if (from == to)
@@ -84,18 +81,18 @@ namespace Chorasmia
 
             if (n >= 2)
             {
-                m_Map[insertPos] = {from, move(value)};
+                m_Map[insertPos] = {from, std::move(value)};
             }
 
             if (n == 0)
             {
                 m_Map.insert(m_Map.begin() + insertPos,
-                             {{from, move(value)},
+                             {{from, std::move(value)},
                               {to, m_Map[fromPos].second}});
             }
             else if (n == 1)
             {
-                m_Map.insert(m_Map.begin() + insertPos, {from, move(value)});
+                m_Map.insert(m_Map.begin() + insertPos, {from, std::move(value)});
             }
             else if (n > 2)
             {

@@ -16,7 +16,7 @@ TEST_CASE("Add rows to Array2D")
         7, 8, 9
     };
 
-    Chorasmia::Array2D<int32_t> grid(move(values), 3, 3);
+    Chorasmia::Array2D<int32_t> grid(std::move(values), 3, 3);
     grid.resize(5, 3);
     REQUIRE(grid.rowCount() == 5);
     REQUIRE(grid.columnCount() == 3);
@@ -37,7 +37,7 @@ TEST_CASE("Remove columns from Array2D")
         6, 7, 8, 9, 0
     };
 
-    Chorasmia::Array2D<int32_t> grid(move(values), 4, 5);
+    Chorasmia::Array2D<int32_t> grid(std::move(values), 4, 5);
     grid.resize(3, 3);
     REQUIRE(grid.rowCount() == 3);
     REQUIRE(grid.columnCount() == 3);
