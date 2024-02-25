@@ -6,7 +6,8 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #include "Chorasmia/ArrayView2D.hpp"
-#include <catch2/catch.hpp>
+#include <numeric>
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("ArrayView2D initialization.")
 {

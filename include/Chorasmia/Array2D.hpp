@@ -40,16 +40,6 @@ namespace Chorasmia
                 throw std::runtime_error("Array2D has incorrect size.");
         }
 
-        constexpr operator ArrayView2D<T>() const noexcept
-        {
-            return {data(), rowCount(), columnCount()};
-        }
-
-        constexpr operator MutableArrayView2D<T>() noexcept
-        {
-            return {data(), rowCount(), columnCount()};
-        }
-
         [[nodiscard]]
         const T& operator()(size_t row, size_t column) const noexcept
         {
@@ -110,6 +100,16 @@ namespace Chorasmia
             return m_Buffer.size();
         }
 
+        constexpr ArrayView2D<T> view() const noexcept
+        {
+            return {data(), rowCount(), columnCount()};
+        }
+
+        constexpr MutableArrayView2D<T> mut() noexcept
+        {
+            return {data(), rowCount(), columnCount()};
+        }
+
         [[nodiscard]]
         ArrayView<T> array() const
         {
@@ -124,32 +124,32 @@ namespace Chorasmia
 
         [[nodiscard]]
         ArrayView2D<T> subarray(size_t row, size_t column,
-                                size_t nrows = SIZE_MAX,
-                                size_t ncolumns = SIZE_MAX) const
+                                size_t n_rows = SIZE_MAX,
+                                size_t n_cols = SIZE_MAX) const
         {
             row = std::min(row, rowCount());
             column = std::min(column, columnCount());
-            nrows = std::min(nrows, rowCount() - row);
-            ncolumns = std::min(ncolumns, columnCount() - column);
+            n_rows = std::min(n_rows, rowCount() - row);
+            n_cols = std::min(n_cols, columnCount() - column);
             return {data() + row * columnCount() + column,
-                    nrows,
-                    ncolumns,
-                    columnCount() - ncolumns};
+                    n_rows,
+                    n_cols,
+                    columnCount() - n_cols};
         }
 
         [[nodiscard]]
         MutableArrayView2D<T> subarray(size_t row, size_t column,
-                                       size_t nrows = SIZE_MAX,
-                                       size_t ncolumns = SIZE_MAX)
+                                       size_t n_rows = SIZE_MAX,
+                                       size_t n_cols = SIZE_MAX)
         {
             row = std::min(row, rowCount());
             column = std::min(column, columnCount());
-            nrows = std::min(nrows, rowCount() - row);
-            ncolumns = std::min(ncolumns, columnCount() - column);
+            n_rows = std::min(n_rows, rowCount() - row);
+            n_cols = std::min(n_cols, columnCount() - column);
             return {data() + row * columnCount() + column,
-                    nrows,
-                    ncolumns,
-                    columnCount() - ncolumns};
+                    n_rows,
+                    n_cols,
+                    columnCount() - n_cols};
         }
 
         [[nodiscard]]

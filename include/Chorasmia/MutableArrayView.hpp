@@ -22,11 +22,6 @@ namespace Chorasmia
               m_Size(size)
         {}
 
-        constexpr operator ArrayView<T>() const noexcept
-        {
-            return ArrayView<T>(m_Data, m_Size);
-        }
-
         [[nodiscard]]
         constexpr T& operator[](size_t i) const
         {
@@ -57,7 +52,7 @@ namespace Chorasmia
             return m_Data;
         }
 
-        constexpr ArrayView<T> immutable() const noexcept
+        constexpr ArrayView<T> view() const noexcept
         {
             return ArrayView<T>(m_Data, m_Size);
         }

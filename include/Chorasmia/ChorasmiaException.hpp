@@ -22,28 +22,15 @@ namespace Chorasmia
     class ChorasmiaException : public std::runtime_error
     {
     public:
-        ChorasmiaException() noexcept
-            : std::runtime_error("Unspecified error.")
-        {}
-
-        /**
-         * @brief Passes @a message on to the base class.
-         */
-        explicit ChorasmiaException(const std::string& message) noexcept
-            : std::runtime_error(message)
-        {}
-
-        explicit ChorasmiaException(const char* message) noexcept
-            : std::runtime_error(message)
-        {}
+        using std::runtime_error::runtime_error;
     };
 }
 
-#define _CHORASMIA_THROW_3(file, line, msg) \
+#define CHORASMIA_IMPL_THROW_3(file, line, msg) \
     throw ::Chorasmia::ChorasmiaException(file ":" #line ": " msg)
 
-#define _CHORASMIA_THROW_2(file, line, msg) \
-    _CHORASMIA_THROW_3(file, line, msg)
+#define CHORASMIA_IMPL_THROW_2(file, line, msg) \
+    CHORASMIA_IMPL_THROW_3(file, line, msg)
 
 #define CHORASMIA_THROW(msg) \
-    _CHORASMIA_THROW_2(__FILE__, __LINE__, msg)
+    CHORASMIA_IMPL_THROW_2(__FILE__, __LINE__, msg)

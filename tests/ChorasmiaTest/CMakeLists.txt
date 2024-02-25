@@ -10,12 +10,11 @@ cmake_minimum_required(VERSION 3.16)
 include(FetchContent)
 FetchContent_Declare(catch
     GIT_REPOSITORY "https://github.com/catchorg/Catch2.git"
-    GIT_TAG "v2.13.3"
-    )
+    GIT_TAG "v3.5.2"
+)
 FetchContent_MakeAvailable(catch)
 
 add_executable(ChorasmiaTest
-    ChorasmiaTestMain.cpp
     test_Approx.cpp
     test_Array2D.cpp
     test_ArrayView2D.cpp
@@ -23,10 +22,11 @@ add_executable(ChorasmiaTest
     test_Index2DMap.cpp
     test_IntervalMap.cpp
     test_MutableArrayView2D.cpp
-    test_RingBuffer.cpp)
+    test_RingBuffer.cpp
+)
 
 target_link_libraries(ChorasmiaTest
     PRIVATE
-        Catch2::Catch2
+        Catch2::Catch2WithMain
         Chorasmia::Chorasmia
-    )
+)

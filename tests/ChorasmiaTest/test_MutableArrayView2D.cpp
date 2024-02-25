@@ -6,8 +6,9 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #include "Chorasmia/MutableArrayView2D.hpp"
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
+#include <numeric>
 #include <vector>
 
 TEST_CASE("MutableArrayView2D subarray")
@@ -16,13 +17,14 @@ TEST_CASE("MutableArrayView2D subarray")
     Chorasmia::MutableArrayView2D grid(values.data(), 4, 4);
     REQUIRE(grid.contiguous());
 
+    [[maybe_unused]]
     Chorasmia::ArrayView<int> a;
-    REQUIRE_NOTHROW(a = grid.array());
+    REQUIRE_NOTHROW(a = grid.array().view());
     auto subgrid = grid.subarray(2, 2, 2, 2);
     REQUIRE(subgrid.rowCount() == 2);
     REQUIRE(subgrid.columnCount() == 2);
     REQUIRE(!subgrid.contiguous());
-    REQUIRE_THROWS(a = subgrid.array());
+    REQUIRE_THROWS(a = subgrid.array().view());
     REQUIRE(grid(3, 3) == 0);
     subgrid(1, 1) = 7;
     REQUIRE(grid(3, 3) == 7);

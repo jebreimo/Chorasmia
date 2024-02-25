@@ -6,7 +6,7 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #include <Chorasmia/IntervalMap.hpp>
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <cfloat>
 
 TEST_CASE("Test IntervalMap point insert")
