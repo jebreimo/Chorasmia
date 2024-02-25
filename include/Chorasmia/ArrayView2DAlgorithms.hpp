@@ -6,6 +6,7 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #pragma once
+#include <algorithm>
 #include "MutableArrayView2D.hpp"
 #include "Index2DMap.hpp"
 
