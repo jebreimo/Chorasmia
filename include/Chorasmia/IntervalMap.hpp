@@ -7,53 +7,61 @@
 //****************************************************************************
 #pragma once
 #include <vector>
-#include "Approx.hpp"
 
 namespace Chorasmia
 {
+    template <typename T>
+    constexpr T get_default_margin()
+    {
+        if constexpr (std::is_floating_point_v<T>)
+            return 100 * std::numeric_limits<T>::epsilon();
+        else
+            return {};
+    }
+
     template <typename Key, typename Value>
     class IntervalMap
     {
     public:
-        using Map = std::vector<std::pair<double, Value>>;
+        using Map = std::vector<std::pair<Key, Value>>;
         using Iterator = typename Map::const_iterator;
 
         explicit IntervalMap(Value defaultValue = {},
-                             Key margin = 100 * std::numeric_limits<Key>::epsilon())
-            : m_Map{{std::numeric_limits<Key>::lowest(),
-                     std::move(defaultValue)},
-                    {std::numeric_limits<Key>::max(), Value()}},
-              m_Margin(margin)
+                             Key margin = get_default_margin<Key>())
+            : map_{{std::numeric_limits<Key>::lowest(),
+                    std::move(defaultValue)},
+                   {std::numeric_limits<Key>::max(), Value()}},
+              margin_(margin)
         {}
 
         [[nodiscard]]
         const std::pair<Key, Value>* data() const
         {
-            return m_Map.data();
+            return map_.data();
         }
 
         [[nodiscard]]
         size_t size() const
         {
-            return m_Map.size();
+            return map_.size();
         }
 
         [[nodiscard]]
         Iterator find(Key key) const
         {
-            return begin() + findImpl(key);
+            return begin() + find_impl(key);
         }
 
         void insert(Key key, Value value)
         {
-            auto pos = findImpl(key);
-            if (m_Map[pos].first == Approx<Key>(key))
+            auto pos = find_impl(key);
+            if (are_equal(map_[pos].first, key))
             {
-                m_Map[pos].second = std::move(value);
+                map_[pos].second = std::move(value);
                 return;
             }
 
-            m_Map.insert(m_Map.begin() + pos + 1, {key, std::move(value)});
+            map_.insert(map_.begin() + pos + 1, {key, std::move(value)});
         }
 
         void insert(Key from, Key to, Value value)
@@ -63,73 +71,90 @@ namespace Chorasmia
             else if (from == to)
                 return;
 
-            auto fromPos = findImpl(from);
-            auto toPos = findImpl(to);
-            auto n = toPos - fromPos;
+            auto from_pos = find_impl(from);
+            auto to_pos = find_impl(to);
+            auto n = to_pos - from_pos;
 
-            size_t insertPos = fromPos + 1;
-            if (m_Map[fromPos].first == Approx<Key>(from, m_Margin))
+            size_t insertPos = from_pos + 1;
+            if (are_equal(map_[from_pos].first, from))
             {
                 ++n;
-                insertPos = fromPos;
+                insertPos = from_pos;
             }
 
             if (n != 0)
             {
-                m_Map[toPos].first = to;
+                map_[to_pos].first = to;
             }
 
             if (n >= 2)
             {
-                m_Map[insertPos] = {from, std::move(value)};
+                map_[insertPos] = {from, std::move(value)};
             }
 
             if (n == 0)
             {
-                m_Map.insert(m_Map.begin() + insertPos,
-                             {{from, std::move(value)},
-                              {to, m_Map[fromPos].second}});
+                map_.insert(map_.begin() + insertPos,
+                            {{from, std::move(value)},
+                              {to, map_[from_pos].second}});
             }
             else if (n == 1)
             {
-                m_Map.insert(m_Map.begin() + insertPos, {from, std::move(value)});
+                map_.insert(map_.begin() + insertPos, {from, std::move(value)});
             }
             else if (n > 2)
             {
-                m_Map.erase(m_Map.begin() + insertPos + 1,
-                            m_Map.begin() + toPos);
+                map_.erase(map_.begin() + insertPos + 1,
+                           map_.begin() + to_pos);
             }
         }
 
         [[nodiscard]]
         Iterator begin() const
         {
-            return m_Map.begin();
+            return map_.begin();
         }
 
         [[nodiscard]]
         Iterator end() const
         {
-            return m_Map.end();
+            return map_.end();
         }
     private:
         [[nodiscard]]
-        size_t findImpl(Key value) const
+        constexpr bool are_equal(Key a, Key b) const
         {
-            Approx<Key> cmpValue(value, m_Margin);
-            size_t b = 0, e = m_Map.size();
-            while (e - b > 1)
-            {
-                auto m = b + (e - b) / 2;
-                if (m_Map[m].first <= cmpValue)
-                    b = m;
-                else
-                    e = m;
-            }
-            return b;
+            if constexpr (std::is_floating_point_v<Key>)
+                return std::abs(b - a) < margin_;
+            else
+                return a == b;
         }
 
-        std::vector<std::pair<Key, Value>> m_Map;
-        Key m_Margin;
+        [[nodiscard]]
+        constexpr bool is_less(Key a, Key b) const
+        {
+            if constexpr (std::is_floating_point_v<Key>)
+                return b - a > margin_;
+            else
+                return a < b;
+        }
+
+        [[nodiscard]]
+        size_t find_impl(Key value) const
+        {
+            size_t first = 0, last = map_.size();
+            while (last - first > 1)
+            {
+                auto m = first + (last - first) / 2;
+                if (is_less(value, map_[m].first))
+                    last = m;
+                else
+                    first = m;
+            }
+            return first;
+        }
+
+        std::vector<std::pair<Key, Value>> map_;
+        Key margin_;
     };
 }

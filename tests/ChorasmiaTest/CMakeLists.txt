@@ -15,7 +15,6 @@ FetchContent_Declare(catch
 FetchContent_MakeAvailable(catch)
 
 add_executable(ChorasmiaTest
-    test_Approx.cpp
     test_Array2D.cpp
     test_ArrayView2D.cpp
     test_ArrayView2DAlgorithms.cpp

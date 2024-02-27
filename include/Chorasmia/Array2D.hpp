@@ -20,36 +20,36 @@ namespace Chorasmia
         Array2D() = default;
 
         Array2D(size_t rows, size_t columns)
-            : m_Buffer(rows * columns),
-              m_RowCount(rows),
-              m_ColumnCount(columns)
+            : buffer_(rows * columns),
+              row_count_(rows),
+              col_count_(columns)
         {}
 
         Array2D(const T* values, size_t rows, size_t columns)
-            : m_Buffer(values, values + rows * columns),
-              m_RowCount(rows),
-              m_ColumnCount(columns)
+            : buffer_(values, values + rows * columns),
+              row_count_(rows),
+              col_count_(columns)
         {}
 
         Array2D(std::vector<T> values, size_t rows, size_t columns)
-            : m_Buffer(std::move(values)),
-              m_RowCount(rows),
-              m_ColumnCount(columns)
+            : buffer_(std::move(values)),
+              row_count_(rows),
+              col_count_(columns)
         {
-            if (valueCount() != m_Buffer.size())
+            if (value_count() != buffer_.size())
                 throw std::runtime_error("Array2D has incorrect size.");
         }
 
         [[nodiscard]]
         const T& operator()(size_t row, size_t column) const noexcept
         {
-            return m_Buffer[row * columnCount() + column];
+            return buffer_[row * col_count() + column];
         }
 
         [[nodiscard]]
         T& operator()(size_t row, size_t column) noexcept
         {
-            return m_Buffer[row * columnCount() + column];
+            return buffer_[row * col_count() + column];
         }
 
         [[nodiscard]]
@@ -67,59 +67,59 @@ namespace Chorasmia
         [[nodiscard]]
         constexpr ArrayView<T> operator[](size_t row) const
         {
-            return {data() + row * columnCount(), columnCount()};
+            return {data() + row * col_count(), col_count()};
         }
 
         [[nodiscard]]
         constexpr MutableArrayView<T> operator[](size_t row)
         {
-            return {data() + row * columnCount(), columnCount()};
+            return {data() + row * col_count(), col_count()};
         }
 
         [[nodiscard]]
         const T* data() const noexcept
         {
-            return m_Buffer.data();
+            return buffer_.data();
         }
 
         [[nodiscard]]
         T* data() noexcept
         {
-            return m_Buffer.data();
+            return buffer_.data();
         }
 
         [[nodiscard]]
         bool empty() const noexcept
         {
-            return m_Buffer.empty();
+            return buffer_.empty();
         }
 
         [[nodiscard]]
         size_t size() const noexcept
         {
-            return m_Buffer.size();
+            return buffer_.size();
         }
 
         constexpr ArrayView2D<T> view() const noexcept
         {
-            return {data(), rowCount(), columnCount()};
+            return {data(), row_count(), col_count()};
         }
 
         constexpr MutableArrayView2D<T> mut() noexcept
         {
-            return {data(), rowCount(), columnCount()};
+            return {data(), row_count(), col_count()};
         }
 
         [[nodiscard]]
         ArrayView<T> array() const
         {
-            return ArrayView<T>(data(), valueCount());
+            return ArrayView<T>(data(), value_count());
         }
 
         [[nodiscard]]
         MutableArrayView<T> array()
         {
-            return MutableArrayView<T>(data(), valueCount());
+            return MutableArrayView<T>(data(), value_count());
         }
 
         [[nodiscard]]
@@ -127,14 +127,14 @@ namespace Chorasmia
                                 size_t n_rows = SIZE_MAX,
                                 size_t n_cols = SIZE_MAX) const
         {
-            row = std::min(row, rowCount());
-            column = std::min(column, columnCount());
-            n_rows = std::min(n_rows, rowCount() - row);
-            n_cols = std::min(n_cols, columnCount() - column);
-            return {data() + row * columnCount() + column,
+            row = std::min(row, row_count());
+            column = std::min(column, col_count());
+            n_rows = std::min(n_rows, row_count() - row);
+            n_cols = std::min(n_cols, col_count() - column);
+            return {data() + row * col_count() + column,
                     n_rows,
                     n_cols,
-                    columnCount() - n_cols};
+                    col_count() - n_cols};
         }
 
         [[nodiscard]]
@@ -142,74 +142,74 @@ namespace Chorasmia
                                        size_t n_rows = SIZE_MAX,
                                        size_t n_cols = SIZE_MAX)
         {
-            row = std::min(row, rowCount());
-            column = std::min(column, columnCount());
-            n_rows = std::min(n_rows, rowCount() - row);
-            n_cols = std::min(n_cols, columnCount() - column);
-            return {data() + row * columnCount() + column,
+            row = std::min(row, row_count());
+            column = std::min(column, col_count());
+            n_rows = std::min(n_rows, row_count() - row);
+            n_cols = std::min(n_cols, col_count() - column);
+            return {data() + row * col_count() + column,
                     n_rows,
                     n_cols,
-                    columnCount() - n_cols};
+                    col_count() - n_cols};
         }
 
         [[nodiscard]]
         constexpr std::pair<size_t, size_t> dimensions() const noexcept
         {
-            return {m_RowCount, m_ColumnCount};
+            return {row_count_, col_count_};
         }
 
         [[nodiscard]]
-        constexpr size_t rowCount() const noexcept
+        constexpr size_t row_count() const noexcept
         {
-            return m_RowCount;
+            return row_count_;
         }
 
         [[nodiscard]]
-        constexpr size_t columnCount() const noexcept
+        constexpr size_t col_count() const noexcept
         {
-            return m_ColumnCount;
+            return col_count_;
         }
 
         [[nodiscard]]
-        constexpr size_t valueCount() const noexcept
+        constexpr size_t value_count() const noexcept
         {
-            return m_RowCount * m_ColumnCount;
+            return row_count_ * col_count_;
         }
 
         void resize(size_t rows, size_t columns)
         {
-            auto oldValueCount = valueCount();
-            auto oldRows = this->rowCount();
-            auto oldColumns = this->columnCount();
-            auto newSize = rows * columns;
-            m_Buffer.resize(newSize);
-            m_RowCount = rows;
-            m_ColumnCount = columns;
+            auto old_value_count = value_count();
+            auto old_rows = this->row_count();
+            auto old_columns = this->col_count();
+            auto new_size = rows * columns;
+            buffer_.resize(new_size);
+            row_count_ = rows;
+            col_count_ = columns;
 
-            if (oldRows == 0)
+            if (old_rows == 0)
                 return;
 
-            if (columns > oldColumns)
+            if (columns > old_columns)
             {
-                auto src = m_Buffer.data() + oldValueCount - 1;
-                auto dst = m_Buffer.data() + (oldRows - 1) * columns + oldColumns - 1;
+                auto src = buffer_.data() + old_value_count - 1;
+                auto dst = buffer_.data() + (old_rows - 1) * columns + old_columns - 1;
                 while (src != dst)
                 {
-                    for (size_t i = 0; i < oldColumns; ++i)
+                    for (size_t i = 0; i < old_columns; ++i)
                         *dst-- = *src--;
-                    for (size_t i = 0; i < columns - oldColumns; ++i)
+                    for (size_t i = 0; i < columns - old_columns; ++i)
                         *dst-- = 0;
                 }
             }
-            else if (columns < oldColumns)
+            else if (columns < old_columns)
             {
-                auto src = m_Buffer.data() + oldColumns;
-                auto dst = m_Buffer.data() + columns;
-                for (size_t i = 0; i < oldRows - 1; ++i)
+                auto src = buffer_.data() + old_columns;
+                auto dst = buffer_.data() + columns;
+                for (size_t i = 0; i < old_rows - 1; ++i)
                 {
                     for (size_t j = 0; j < columns; ++j)
                         *dst++ = *src++;
-                    src += oldColumns - columns;
+                    src += old_columns - columns;
                 }
             }
         }
@@ -217,46 +217,46 @@ namespace Chorasmia
         [[nodiscard]]
         MutableIterator begin() noexcept
         {
-            return MutableIterator({data(), columnCount()});
+            return MutableIterator({data(), col_count()});
         }
 
         [[nodiscard]]
         ConstIterator begin() const noexcept
         {
-            return ConstIterator({data(), columnCount()});
+            return ConstIterator({data(), col_count()});
         }
 
         [[nodiscard]]
         MutableIterator end() noexcept
         {
-            return MutableIterator({data() + valueCount(), columnCount()});
+            return MutableIterator({data() + value_count(), col_count()});
         }
 
         [[nodiscard]]
         ConstIterator end() const noexcept
         {
-            return ConstIterator({data() + valueCount(), columnCount()});
+            return ConstIterator({data() + value_count(), col_count()});
         }
 
         [[nodiscard]]
         std::vector<T> release()
         {
-            m_RowCount = m_ColumnCount = 0;
-            auto tmp = std::move(m_Buffer);
+            row_count_ = col_count_ = 0;
+            auto tmp = std::move(buffer_);
             return std::move(tmp);
         }
 
         void fill(const T& value)
         {
-            std::fill(m_Buffer.begin(), m_Buffer.end(), value);
+            std::fill(buffer_.begin(), buffer_.end(), value);
         }
 
         [[nodiscard]]
         friend bool operator==(const Array2D& a, const Array2D& b)
         {
-            return a.rowCount() == b.rowCount()
-                   && a.columnCount() == b.columnCount()
-                   && a.m_Buffer == b.m_Buffer;
+            return a.row_count() == b.row_count()
+                   && a.col_count() == b.col_count()
+                   && a.buffer_ == b.buffer_;
         }
 
         [[nodiscard]]
@@ -283,8 +283,8 @@ namespace Chorasmia
             return a.size();
         }
     private:
-        std::vector<T> m_Buffer;
-        size_t m_RowCount = 0;
-        size_t m_ColumnCount = 0;
+        std::vector<T> buffer_;
+        size_t row_count_ = 0;
+        size_t col_count_ = 0;
     };
 }

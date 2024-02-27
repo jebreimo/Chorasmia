@@ -18,9 +18,9 @@ TEST_CASE("ArrayView2D initialization.")
     };
 
     Chorasmia::ArrayView2D<int32_t> grid(values.data(), 3, 3);
-    REQUIRE(grid.rowCount() == 3);
-    REQUIRE(grid.columnCount() == 3);
-    REQUIRE(grid.columnCount() == 3);
+    REQUIRE(grid.row_count() == 3);
+    REQUIRE(grid.col_count() == 3);
+    REQUIRE(grid.col_count() == 3);
     REQUIRE(grid(0, 0) == values[0]);
     REQUIRE(grid(1, 0) == values[3]);
     REQUIRE(grid(2, 1) == values[7]);

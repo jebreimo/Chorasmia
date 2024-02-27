@@ -18,8 +18,8 @@ TEST_CASE("Add rows to Array2D")
 
     Chorasmia::Array2D<int32_t> grid(std::move(values), 3, 3);
     grid.resize(5, 3);
-    REQUIRE(grid.rowCount() == 5);
-    REQUIRE(grid.columnCount() == 3);
+    REQUIRE(grid.row_count() == 5);
+    REQUIRE(grid.col_count() == 3);
     REQUIRE(grid(0, 0) == 1);
     REQUIRE(grid(0, 2) == 3);
     REQUIRE(grid(2, 0) == 7);
@@ -39,8 +39,8 @@ TEST_CASE("Remove columns from Array2D")
 
     Chorasmia::Array2D<int32_t> grid(std::move(values), 4, 5);
     grid.resize(3, 3);
-    REQUIRE(grid.rowCount() == 3);
-    REQUIRE(grid.columnCount() == 3);
+    REQUIRE(grid.row_count() == 3);
+    REQUIRE(grid.col_count() == 3);
     REQUIRE(grid(0, 0) == 1);
     REQUIRE(grid(0, 2) == 3);
     REQUIRE(grid(1, 0) == 6);
@@ -53,8 +53,8 @@ TEST_CASE("Resize empty Array2D")
 {
     Chorasmia::Array2D<int32_t> grid;
     grid.resize(3, 3);
-    REQUIRE(grid.rowCount() == 3);
-    REQUIRE(grid.columnCount() == 3);
+    REQUIRE(grid.row_count() == 3);
+    REQUIRE(grid.col_count() == 3);
 }
 
 TEST_CASE("Iterate over an Array2D")

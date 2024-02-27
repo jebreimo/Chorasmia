@@ -22,26 +22,28 @@ TEST_CASE("Test MatrixTraversalMethod")
     REQUIRE(invert(MP::COLUMNS) == MP::COLUMNS);
 }
 
-TEST_CASE("Test rotateCcw")
+TEST_CASE("Test rotate_ccw")
 {
     using MP = Chorasmia::Index2DMode;
-    REQUIRE(rotateCcw(MP::ROWS, 0) == MP::ROWS);
-    REQUIRE(rotateCcw(MP::ROWS, 1) == MP::COLUMNS_REVERSED_ORDER);
-    REQUIRE(rotateCcw(MP::ROWS, 2) == MP::REVERSED_ROWS_REVERSED_ORDER);
-    REQUIRE(rotateCcw(MP::ROWS, 3) == MP::REVERSED_COLUMNS);
-    REQUIRE(rotateCcw(MP::ROWS, 4) == MP::ROWS);
-    REQUIRE(rotateCcw(MP::ROWS, 5) == MP::COLUMNS_REVERSED_ORDER);
-    REQUIRE(rotateCcw(MP::ROWS, -1) == MP::REVERSED_COLUMNS);
+    REQUIRE(rotate_ccw(MP::ROWS, 0) == MP::ROWS);
+    REQUIRE(rotate_ccw(MP::ROWS, 1) == MP::COLUMNS_REVERSED_ORDER);
+    REQUIRE(rotate_ccw(MP::ROWS, 2) == MP::REVERSED_ROWS_REVERSED_ORDER);
+    REQUIRE(rotate_ccw(MP::ROWS, 3) == MP::REVERSED_COLUMNS);
+    REQUIRE(rotate_ccw(MP::ROWS, 4) == MP::ROWS);
+    REQUIRE(rotate_ccw(MP::ROWS, 5) == MP::COLUMNS_REVERSED_ORDER);
+    REQUIRE(rotate_ccw(MP::ROWS, -1) == MP::REVERSED_COLUMNS);
 
-    REQUIRE(rotateCcw(MP::REVERSED_COLUMNS_REVERSED_ORDER, 0) == MP::REVERSED_COLUMNS_REVERSED_ORDER);
-    REQUIRE(rotateCcw(MP::REVERSED_COLUMNS_REVERSED_ORDER, 1) == MP::REVERSED_ROWS);
-    REQUIRE(rotateCcw(MP::REVERSED_COLUMNS_REVERSED_ORDER, 2) == MP::COLUMNS);
-    REQUIRE(rotateCcw(MP::REVERSED_COLUMNS_REVERSED_ORDER, 3) == MP::ROWS_REVERSED_ORDER);
-    REQUIRE(rotateCcw(MP::REVERSED_COLUMNS_REVERSED_ORDER, 4) == MP::REVERSED_COLUMNS_REVERSED_ORDER);
-    REQUIRE(rotateCcw(MP::REVERSED_COLUMNS_REVERSED_ORDER, 5) == MP::REVERSED_ROWS);
-    REQUIRE(rotateCcw(MP::REVERSED_COLUMNS_REVERSED_ORDER, -1) == MP::ROWS_REVERSED_ORDER);
-    REQUIRE(rotateCcw(MP::REVERSED_COLUMNS_REVERSED_ORDER, -2) == MP::COLUMNS);
-    REQUIRE(rotateCcw(MP::REVERSED_COLUMNS_REVERSED_ORDER, -3) == MP::REVERSED_ROWS);
+    REQUIRE(
+        rotate_ccw(MP::REVERSED_COLUMNS_REVERSED_ORDER, 0) == MP::REVERSED_COLUMNS_REVERSED_ORDER);
+    REQUIRE(rotate_ccw(MP::REVERSED_COLUMNS_REVERSED_ORDER, 1) == MP::REVERSED_ROWS);
+    REQUIRE(rotate_ccw(MP::REVERSED_COLUMNS_REVERSED_ORDER, 2) == MP::COLUMNS);
+    REQUIRE(rotate_ccw(MP::REVERSED_COLUMNS_REVERSED_ORDER, 3) == MP::ROWS_REVERSED_ORDER);
+    REQUIRE(
+        rotate_ccw(MP::REVERSED_COLUMNS_REVERSED_ORDER, 4) == MP::REVERSED_COLUMNS_REVERSED_ORDER);
+    REQUIRE(rotate_ccw(MP::REVERSED_COLUMNS_REVERSED_ORDER, 5) == MP::REVERSED_ROWS);
+    REQUIRE(rotate_ccw(MP::REVERSED_COLUMNS_REVERSED_ORDER, -1) == MP::ROWS_REVERSED_ORDER);
+    REQUIRE(rotate_ccw(MP::REVERSED_COLUMNS_REVERSED_ORDER, -2) == MP::COLUMNS);
+    REQUIRE(rotate_ccw(MP::REVERSED_COLUMNS_REVERSED_ORDER, -3) == MP::REVERSED_ROWS);
 }
 
 TEST_CASE("Test invert Index2DMode")
@@ -86,9 +88,9 @@ void test_Map(Chorasmia::Index2DMode p,
         {
             auto [iTo, jTo] = toIndices[n++];
             CAPTURE(p, i, j, iTo, jTo);
-            auto to = map.getToIndices(i, j);
+            auto to = map.get_to_indices(i, j);
             REQUIRE(to == id(iTo, jTo));
-            auto from = map.getFromIndices(iTo, jTo);
+            auto from = map.get_from_indices(iTo, jTo);
             REQUIRE(from == id(i, j));
         }
     }

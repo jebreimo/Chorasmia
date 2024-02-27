@@ -21,8 +21,8 @@ TEST_CASE("MutableArrayView2D subarray")
     Chorasmia::ArrayView<int> a;
     REQUIRE_NOTHROW(a = grid.array().view());
     auto subgrid = grid.subarray(2, 2, 2, 2);
-    REQUIRE(subgrid.rowCount() == 2);
-    REQUIRE(subgrid.columnCount() == 2);
+    REQUIRE(subgrid.row_count() == 2);
+    REQUIRE(subgrid.col_count() == 2);
     REQUIRE(!subgrid.contiguous());
     REQUIRE_THROWS(a = subgrid.array().view());
     REQUIRE(grid(3, 3) == 0);

@@ -6,7 +6,6 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #pragma once
-
 #include <cstddef>
 
 namespace Chorasmia
@@ -18,44 +17,44 @@ namespace Chorasmia
         constexpr ArrayView() = default;
 
         constexpr ArrayView(const T* data, size_t size) noexcept
-            : m_Data(data),
-              m_Size(size)
+            : data_(data),
+              size_(size)
         {}
 
         [[nodiscard]]
         const T& operator[](size_t i) const
         {
-            return m_Data[i];
+            return data_[i];
         }
 
         [[nodiscard]]
         const T* begin() const
         {
-            return m_Data;
+            return data_;
         }
 
         [[nodiscard]]
         const T* end() const
         {
-            return m_Data + m_Size;
+            return data_ + size_;
         }
 
         [[nodiscard]]
         constexpr size_t size() const
         {
-            return m_Size;
+            return size_;
         }
 
         [[nodiscard]]
         const T* data() const
         {
-            return m_Data;
+            return data_;
         }
 
         constexpr ArrayView<T>
         subarray(size_t offset, size_t length = SIZE_MAX) const noexcept
         {
-            return {m_Data + offset, std::min(m_Size - offset, length)};
+            return {data_ + offset, std::min(size_ - offset, length)};
         }
 
         [[nodiscard]]
@@ -73,13 +72,13 @@ namespace Chorasmia
         }
 
     private:
-        const T* m_Data = nullptr;
-        size_t m_Size = 0;
+        const T* data_ = nullptr;
+        size_t size_ = 0;
     };
 
     template <typename T>
     [[nodiscard]]
-    constexpr bool areIdentical(const ArrayView<T>& a, const ArrayView<T>& b)
+    constexpr bool are_identical(const ArrayView<T>& a, const ArrayView<T>& b)
     {
         return a.data() == b.data() && a.size() == b.size();
     }

@@ -28,17 +28,17 @@ namespace Chorasmia
         constexpr MutableArrayView2D(T* data,
                                      size_t rows,
                                      size_t columns,
-                                     size_t rowGapSize) noexcept
-            : m_Data(data),
-              m_RowCount(rows),
-              m_ColumnCount(columns),
-              m_RowGap(rowGapSize)
+                                     size_t row_gap_size) noexcept
+            : data_(data),
+              row_count_(rows),
+              col_count_(columns),
+              row_gap_(row_gap_size)
         {}
 
         [[nodiscard]]
         T& operator()(size_t row, size_t column) const noexcept
         {
-            return m_Data[row * rowSize() + column];
+            return data_[row * row_size() + column];
         }
 
         [[nodiscard]]
@@ -50,30 +50,30 @@ namespace Chorasmia
         [[nodiscard]]
         constexpr MutableArrayView<T> operator[](size_t row) const noexcept
         {
-            return {data() + row * rowSize(), columnCount()};
+            return {data() + row * row_size(), col_count()};
         }
 
         [[nodiscard]]
         constexpr T* data() const noexcept
         {
-            return m_Data;
+            return data_;
         }
 
         [[nodiscard]]
         constexpr bool empty() const noexcept
         {
-            return m_RowCount == 0 || m_ColumnCount == 0;
+            return row_count_ == 0 || col_count_ == 0;
         }
 
         [[nodiscard]]
         constexpr bool contiguous() const noexcept
         {
-            return m_RowGap == 0;
+            return row_gap_ == 0;
         }
 
         constexpr ArrayView2D<T> view() const noexcept
         {
-            return {data(), rowCount(), columnCount(), m_RowGap};
+            return {data(), row_count(), col_count(), row_gap_};
         }
 
         [[nodiscard]]
@@ -81,7 +81,7 @@ namespace Chorasmia
         {
             if (!contiguous())
                 CHORASMIA_THROW("Can not create MutableArrayView from non-contiguous MutableArrayView2D.");
-            return MutableArrayView<T>(data(), valueCount());
+            return MutableArrayView<T>(data(), value_count());
         }
 
         [[nodiscard]]
@@ -89,66 +89,66 @@ namespace Chorasmia
                                        size_t n_rows = SIZE_MAX,
                                        size_t n_cols = SIZE_MAX) const
         {
-            row = std::min(row, rowCount());
-            column = std::min(column, columnCount());
-            n_rows = std::min(n_rows, rowCount() - row);
-            n_cols = std::min(n_cols, columnCount() - column);
-            return {data() + row * rowSize() + column,
+            row = std::min(row, row_count());
+            column = std::min(column, col_count());
+            n_rows = std::min(n_rows, row_count() - row);
+            n_cols = std::min(n_cols, col_count() - column);
+            return {data() + row * row_size() + column,
                     n_rows,
                     n_cols,
-                    m_RowGap + columnCount() - n_cols};
+                    row_gap_ + col_count() - n_cols};
         }
 
         [[nodiscard]]
         constexpr std::pair<size_t, size_t> dimensions() const noexcept
         {
-            return {m_RowCount, m_ColumnCount};
+            return {row_count_, col_count_};
         }
 
         [[nodiscard]]
-        constexpr size_t rowCount() const noexcept
+        constexpr size_t row_count() const noexcept
         {
-            return m_RowCount;
+            return row_count_;
         }
 
         [[nodiscard]]
-        constexpr size_t columnCount() const noexcept
+        constexpr size_t col_count() const noexcept
         {
-            return m_ColumnCount;
+            return col_count_;
         }
 
         [[nodiscard]]
-        constexpr size_t valueCount() const noexcept
+        constexpr size_t value_count() const noexcept
         {
-            return m_RowCount * m_ColumnCount;
+            return row_count_ * col_count_;
         }
 
         [[nodiscard]]
         MutableIterator begin() const noexcept
         {
-            return MutableIterator({m_Data, columnCount()}, m_RowGap);
+            return MutableIterator({data_, col_count()}, row_gap_);
         }
 
         [[nodiscard]]
         MutableIterator end() const noexcept
         {
-            return MutableIterator({m_Data + rowCount() * rowSize(), columnCount()},
-                                   m_RowGap);
+            return MutableIterator({data_ + row_count() * row_size(), col_count()},
+                                   row_gap_);
         }
 
         [[nodiscard]]
         friend bool
         operator==(const MutableArrayView2D& a, const MutableArrayView2D& b)
         {
-            if (a.rowCount() != b.rowCount()
-                || a.columnCount() != b.columnCount())
+            if (a.row_count() != b.row_count()
+                || a.col_count() != b.col_count())
                 return false;
-            if (a.m_RowGap == b.m_RowGap && a.data() == b.data())
+            if (a.row_gap_ == b.row_gap_ && a.data() == b.data())
                 return true;
-            return equalSequencesWithGaps(
-                a.data(), a.data() + a.rowCount() * a.rowSize(), a.m_RowGap,
-                b.data(), b.m_RowGap,
-                a.columnCount());
+            return equal_sequences_with_gaps(
+                a.data(), a.data() + a.row_count() * a.row_size(), a.row_gap_,
+                b.data(), b.row_gap_,
+                a.col_count());
         }
 
         [[nodiscard]]
@@ -159,14 +159,14 @@ namespace Chorasmia
         }
     private:
         [[nodiscard]]
-        constexpr size_t rowSize() const
+        constexpr size_t row_size() const
         {
-            return columnCount() + m_RowGap;
+            return col_count() + row_gap_;
         }
 
-        T* m_Data = nullptr;
-        size_t m_RowCount = 0;
-        size_t m_ColumnCount = 0;
-        size_t m_RowGap = 0;
+        T* data_ = nullptr;
+        size_t row_count_ = 0;
+        size_t col_count_ = 0;
+        size_t row_gap_ = 0;
     };
 }
