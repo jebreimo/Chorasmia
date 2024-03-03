@@ -39,7 +39,7 @@ namespace Chorasmia
 
     constexpr Index2DMode invert(Index2DMode path)
     {
-        if ((unsigned(path) + 1u & 0b110u) != 0b110)
+        if (((unsigned(path) + 1u) & 0b110u) != 0b110)
             return path;
         else
             return Index2DMode(unsigned(path) ^ 0b11u);
