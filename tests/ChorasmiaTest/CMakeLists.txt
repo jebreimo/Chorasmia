@@ -12,7 +12,10 @@ FetchContent_Declare(catch
     GIT_REPOSITORY "https://github.com/catchorg/Catch2.git"
     GIT_TAG "v3.5.2"
 )
-FetchContent_MakeAvailable(catch)
+FetchContent_Declare(xyz
+    GIT_REPOSITORY "https://github.com/jebreimo/Xyz.git"
+    GIT_TAG v0.3.1)
+FetchContent_MakeAvailable(catch xyz)
 
 add_executable(ChorasmiaTest
     test_Array2D.cpp
@@ -28,4 +31,5 @@ target_link_libraries(ChorasmiaTest
     PRIVATE
         Catch2::Catch2WithMain
         Chorasmia::Chorasmia
+        Xyz::Xyz
 )
