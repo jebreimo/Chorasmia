@@ -18,7 +18,7 @@ namespace Chorasmia
         D = 8
     };
 
-    CHORASMIA_ENABLE_BITMASK_OPERATORS(Chorasmia::MyEnum);
+    CHORASMIA_ENABLE_BITMASK_OPERATORS(MyEnum);
 }
 
 
