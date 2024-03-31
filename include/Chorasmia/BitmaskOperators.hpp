@@ -87,7 +87,7 @@ namespace Chorasmia
 
 #define CHORASMIA_ENABLE_BITMASK_OPERATORS(E) \
     template <> \
-    struct ::Chorasmia::enable_bitmask_operators<E> \
+    struct enable_bitmask_operators<E> \
     { \
         static constexpr bool enable = true; \
     }
