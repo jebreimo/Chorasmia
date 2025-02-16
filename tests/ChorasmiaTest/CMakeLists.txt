@@ -14,7 +14,7 @@ FetchContent_Declare(catch
 )
 FetchContent_Declare(xyz
     GIT_REPOSITORY "https://github.com/jebreimo/Xyz.git"
-    GIT_TAG v0.4.0)
+    GIT_TAG "v0.4.0")
 FetchContent_MakeAvailable(catch xyz)
 
 add_executable(ChorasmiaTest
