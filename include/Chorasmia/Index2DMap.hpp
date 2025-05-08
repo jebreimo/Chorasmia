@@ -49,7 +49,7 @@ namespace Chorasmia
     constexpr Index2DMode rotate_ccw(Index2DMode path, int turns)
     {
         unsigned mask = 0;
-        unsigned b = unsigned(path) & 4u;
+        const unsigned b = unsigned(path) & 4u;
         if (turns < 0)
             turns = 4 - (-turns % 4);
 
@@ -79,7 +79,7 @@ namespace Chorasmia
         constexpr std::pair<size_t, size_t>
         get_from_indices(size_t i, size_t j) const
         {
-            auto u = unsigned(inverse_path_);
+            const auto u = unsigned(inverse_path_);
             if (is_row_major(inverse_path_))
             {
                 return {(u & 0b10u) ? from_size_.first - 1 - i : i,
@@ -96,7 +96,7 @@ namespace Chorasmia
         constexpr std::pair<size_t, size_t>
         get_to_indices(size_t i, size_t j) const
         {
-            auto u = unsigned(path_);
+            const auto u = unsigned(path_);
             if (is_row_major(path_))
             {
                 return {(u & 0b10u) ? from_size_.first - 1 - i : i,

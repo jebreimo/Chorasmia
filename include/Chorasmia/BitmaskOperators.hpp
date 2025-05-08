@@ -28,59 +28,59 @@ namespace Chorasmia
         = enable_bitmask_operators<E>::enable;
 
     template <typename E>
-    typename std::enable_if_t<enable_bitmask_operators_v<E>, E>
+    std::enable_if_t<enable_bitmask_operators_v<E>, E>
     operator&(E lhs, E rhs)
     {
-        typedef typename std::underlying_type_t<E> underlying;
+        typedef std::underlying_type_t<E> underlying;
         return static_cast<E>(static_cast<underlying>(lhs)
-                              & static_cast<underlying>(rhs));
+            & static_cast<underlying>(rhs));
     }
 
     template <typename E>
-    typename std::enable_if_t<enable_bitmask_operators_v<E>, E>
+    std::enable_if_t<enable_bitmask_operators_v<E>, E>
     operator|(E lhs, E rhs)
     {
-        typedef typename std::underlying_type_t<E> underlying;
+        typedef std::underlying_type_t<E> underlying;
         return static_cast<E>(static_cast<underlying>(lhs)
-                              | static_cast<underlying>(rhs));
+            | static_cast<underlying>(rhs));
     }
 
     template <typename E>
-    typename std::enable_if_t<enable_bitmask_operators_v<E>, E>
+    std::enable_if_t<enable_bitmask_operators_v<E>, E>
     operator^(E lhs, E rhs)
     {
-        typedef typename std::underlying_type_t<E> underlying;
+        typedef std::underlying_type_t<E> underlying;
         return static_cast<E>(static_cast<underlying>(lhs)
-                              ^ static_cast<underlying>(rhs));
+            ^ static_cast<underlying>(rhs));
     }
 
     template <typename E>
-    typename std::enable_if_t<enable_bitmask_operators_v<E>, E&>
+    std::enable_if_t<enable_bitmask_operators_v<E>, E&>
     operator&=(E& lhs, E rhs)
     {
-        typedef typename std::underlying_type_t<E> underlying;
+        typedef std::underlying_type_t<E> underlying;
         lhs = static_cast<E>(static_cast<underlying>(lhs)
-                             & static_cast<underlying>(rhs));
+            & static_cast<underlying>(rhs));
         return lhs;
     }
 
     template <typename E>
-    typename std::enable_if_t<enable_bitmask_operators_v<E>, E&>
+    std::enable_if_t<enable_bitmask_operators_v<E>, E&>
     operator|=(E& lhs, E rhs)
     {
-        typedef typename std::underlying_type_t<E> underlying;
+        typedef std::underlying_type_t<E> underlying;
         lhs = static_cast<E>(static_cast<underlying>(lhs)
-                             | static_cast<underlying>(rhs));
+            | static_cast<underlying>(rhs));
         return lhs;
     }
 
     template <typename E>
-    typename std::enable_if_t<enable_bitmask_operators_v<E>, E&>
+    std::enable_if_t<enable_bitmask_operators_v<E>, E&>
     operator^=(E& lhs, E rhs)
     {
-        typedef typename std::underlying_type_t<E> underlying;
+        typedef std::underlying_type_t<E> underlying;
         lhs = static_cast<E>(static_cast<underlying>(lhs)
-                             ^ static_cast<underlying>(rhs));
+            ^ static_cast<underlying>(rhs));
         return lhs;
     }
 }

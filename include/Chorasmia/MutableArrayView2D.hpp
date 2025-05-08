@@ -42,7 +42,7 @@ namespace Chorasmia
         }
 
         [[nodiscard]]
-        T& operator()(std::pair<size_t, size_t> pos) const noexcept
+        T& operator()(const std::pair<size_t, size_t>& pos) const noexcept
         {
             return operator()(pos.first, pos.second);
         }
@@ -80,23 +80,28 @@ namespace Chorasmia
         MutableArrayView<T> array() const
         {
             if (!contiguous())
-                CHORASMIA_THROW("Can not create MutableArrayView from non-contiguous MutableArrayView2D.");
+            {
+                CHORASMIA_THROW(
+                    "Can not create MutableArrayView from non-contiguous MutableArrayView2D.");
+            }
             return MutableArrayView<T>(data(), value_count());
         }
 
         [[nodiscard]]
-        MutableArrayView2D<T> subarray(size_t row, size_t column,
-                                       size_t n_rows = SIZE_MAX,
-                                       size_t n_cols = SIZE_MAX) const
+        MutableArrayView2D subarray(size_t row, size_t column,
+                                    size_t n_rows = SIZE_MAX,
+                                    size_t n_cols = SIZE_MAX) const
         {
             row = std::min(row, row_count());
             column = std::min(column, col_count());
             n_rows = std::min(n_rows, row_count() - row);
             n_cols = std::min(n_cols, col_count() - column);
-            return {data() + row * row_size() + column,
-                    n_rows,
-                    n_cols,
-                    row_gap_ + col_count() - n_cols};
+            return {
+                data() + row * row_size() + column,
+                n_rows,
+                n_cols,
+                row_gap_ + col_count() - n_cols
+            };
         }
 
         [[nodiscard]]
@@ -157,6 +162,7 @@ namespace Chorasmia
         {
             return !(a == b);
         }
+
     private:
         [[nodiscard]]
         constexpr size_t row_size() const

@@ -42,7 +42,7 @@ namespace Chorasmia
               const MutableArrayView2D<T>& dst,
               Index2DMode path)
     {
-        Index2DMap mapping(src.dimensions(), path);
+        const Index2DMap mapping(src.dimensions(), path);
         if (mapping.get_to_size() != dst.dimensions())
             CHORASMIA_THROW("dst has incorrect dimensions.");
         const auto[m, n] = mapping.get_to_size();
@@ -90,7 +90,7 @@ namespace Chorasmia
         bool on_boundary = false;
 
         double i_int;
-        auto i_frac = std::modf(i, &i_int);
+        const auto i_frac = std::modf(i, &i_int);
         const auto i_idx = size_t(i_int);
         if (i_int < 0 || i_frac < 0 || array.row_count() - 1 <= i_idx)
         {
@@ -100,7 +100,7 @@ namespace Chorasmia
         }
 
         double j_int;
-        auto j_frac = std::modf(j, &j_int);
+        const auto j_frac = std::modf(j, &j_int);
         const auto j_idx = size_t(j_int);
         if (j_int < 0 || j_frac < 0 || array.col_count() - 1 <= j_idx)
         {

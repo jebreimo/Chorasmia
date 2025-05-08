@@ -16,14 +16,14 @@ namespace Chorasmia
     class ArrayView2DIterator
     {
     public:
-        using ArrayViewType = typename std::conditional<IsMutable,
-            MutableArrayView<T>, ArrayView<T>>::type;
+        using ArrayViewType = std::conditional_t<IsMutable,
+                                                 MutableArrayView<T>,
+                                                 ArrayView<T>>;
 
         ArrayView2DIterator() = default;
 
         constexpr explicit ArrayView2DIterator(const ArrayViewType& row) noexcept
-            : row_(row),
-              row_gap_(0)
+            : row_(row)
         {}
 
         constexpr ArrayView2DIterator(const ArrayViewType& row,
@@ -34,23 +34,29 @@ namespace Chorasmia
 
         ArrayView2DIterator& operator++()
         {
-            row_ = ArrayViewType{row_.data() + row_size(),
-                                 row_.size()};
+            row_ = ArrayViewType{
+                row_.data() + row_size(),
+                row_.size()
+            };
             return *this;
         }
 
         ArrayView2DIterator operator++(int)
         {
             auto p = *this;
-            row_ = ArrayViewType{row_.data() + row_size(),
-                                 row_.size()};
+            row_ = ArrayViewType{
+                row_.data() + row_size(),
+                row_.size()
+            };
             return p;
         }
 
         ArrayView2DIterator& operator+=(size_t n)
         {
-            row_ = ArrayViewType{row_.data() + n * row_size(),
-                                 row_.size()};
+            row_ = ArrayViewType{
+                row_.data() + n * row_size(),
+                row_.size()
+            };
             return *this;
         }
 
@@ -99,6 +105,7 @@ namespace Chorasmia
         {
             return !(a == b);
         }
+
     private:
         [[nodiscard]]
         constexpr size_t row_size() const

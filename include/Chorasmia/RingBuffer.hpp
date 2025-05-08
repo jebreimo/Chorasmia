@@ -43,7 +43,7 @@ namespace Chorasmia
             return *this;
         }
 
-        const RingBufferIterator operator++(int)
+        RingBufferIterator operator++(int)
         {
             auto result = *this;
             if (std::distance(first_, ++current_) == N + 1)
@@ -60,7 +60,7 @@ namespace Chorasmia
             return *this;
         }
 
-        const RingBufferIterator operator--(int)
+        RingBufferIterator operator--(int)
         {
             auto result = *this;
             if (first_ != current_)

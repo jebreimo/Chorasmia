@@ -56,7 +56,7 @@ namespace Chorasmia
             return ArrayView<T>(data_, size_);
         }
 
-        constexpr MutableArrayView<T>
+        constexpr MutableArrayView
         subarray(size_t offset, size_t length = SIZE_MAX) const noexcept
         {
             return {data_ + offset, std::min(size_ - offset, length)};
