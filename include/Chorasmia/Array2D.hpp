@@ -7,6 +7,7 @@
 //****************************************************************************
 #pragma once
 #include "MutableArrayView2D.hpp"
+#include <string>
 
 namespace Chorasmia
 {
@@ -57,13 +58,13 @@ namespace Chorasmia
         }
 
         [[nodiscard]]
-        const T& operator()(std::pair<size_t, size_t> pos) const noexcept
+        const T& operator()(const std::pair<size_t, size_t>& pos) const noexcept
         {
             return operator()(pos.first, pos.second);
         }
 
         [[nodiscard]]
-        T& operator()(std::pair<size_t, size_t> pos) noexcept
+        T& operator()(const std::pair<size_t, size_t>& pos) noexcept
         {
             return operator()(pos.first, pos.second);
         }
