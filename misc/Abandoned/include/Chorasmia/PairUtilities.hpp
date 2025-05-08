@@ -9,8 +9,8 @@
 #include <utility>
 #include <vector>
 
-namespace Ylgorithm {
-
+namespace Chorasmia
+{
     template <typename T, typename U>
     struct Firster
     {
