@@ -37,7 +37,11 @@ namespace Chorasmia
               col_count_(columns)
         {
             if (value_count() != buffer_.size())
-                throw std::runtime_error("Array2D has incorrect size.");
+            {
+                CHORASMIA_THROW("Array2D has incorrect size. Expected "
+                    + std::to_string(value_count()) +
+                    " but got " + std::to_string(buffer_.size()));
+            }
         }
 
         [[nodiscard]]
