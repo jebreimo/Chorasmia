@@ -51,6 +51,12 @@ namespace Chorasmia
         }
 
         [[nodiscard]]
+        T& operator[](Index2D<size_t> index) noexcept
+        {
+            return buffer_[index.row * col_count() + index.column];
+        }
+
+        [[nodiscard]]
         constexpr ArrayView<T> row(size_t row) const
         {
             return {data() + row * col_count(), col_count()};
