@@ -6,6 +6,7 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #pragma once
+#include <optional>
 #include "Index2D.hpp"
 
 namespace Chorasmia
