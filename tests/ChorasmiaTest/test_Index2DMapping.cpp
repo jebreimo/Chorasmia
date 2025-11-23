@@ -5,7 +5,7 @@
 // This file is distributed under the BSD License.
 // License text is included with the source distribution.
 //****************************************************************************
-#include <Chorasmia/Index2DMap.hpp>
+#include <Chorasmia/Index2DMapping.hpp>
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("Test MatrixTraversalMethod")
@@ -79,19 +79,18 @@ void test_Map(Chorasmia::Index2DMode p,
               const std::vector<std::pair<std::size_t, std::size_t>>& toIndices)
 {
     using namespace Chorasmia;
-    using id = std::pair<size_t, size_t>;
-    Index2DMap map({fromRows, fromCols}, p);
+    Index2DMapping<size_t> mapping({fromRows, fromCols}, p);
     size_t n = 0;
     for (size_t i = 0; i < fromRows; ++i)
     {
         for (size_t j = 0; j < fromCols; ++j)
         {
-            auto [iTo, jTo] = toIndices[n++];
-            CAPTURE(p, i, j, iTo, jTo);
-            auto to = map.get_to_indices(i, j);
-            REQUIRE(to == id(iTo, jTo));
-            auto from = map.get_from_indices(iTo, jTo);
-            REQUIRE(from == id(i, j));
+            auto [i_to, j_to] = toIndices[n++];
+            CAPTURE(p, i, j, i_to, j_to);
+            auto to = mapping.get_to_index({i, j});
+            REQUIRE(to == Index2D<size_t>(i_to, j_to));
+            auto from = mapping.get_from_index({i_to, j_to});
+            REQUIRE(from == Index2D<size_t>(i, j));
         }
     }
 }

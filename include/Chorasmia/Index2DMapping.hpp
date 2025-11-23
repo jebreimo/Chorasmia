@@ -9,6 +9,8 @@
 #include <cstddef>
 #include <utility>
 
+#include "Index2D.hpp"
+
 namespace Chorasmia
 {
     enum class Index2DMode
@@ -56,76 +58,88 @@ namespace Chorasmia
         switch (turns % 4)
         {
         default: break;
-        case 1: mask = (4u | (b >> 1u) | ((b >> 2u) ^ 1u)); break;
-        case 2: mask = 3; break;
-        case 3: mask = (4u | ((b >> 1u) ^ 2u) | (b >> 2u)); break;
+        case 1: mask = (4u | (b >> 1u) | ((b >> 2u) ^ 1u));
+            break;
+        case 2: mask = 3;
+            break;
+        case 3: mask = (4u | ((b >> 1u) ^ 2u) | (b >> 2u));
+            break;
         }
 
         return Index2DMode(unsigned(path) ^ mask);
     }
 
-    class Index2DMap
+    template <std::integral T>
+    class Index2DMapping
     {
     public:
-        constexpr Index2DMap(
-            std::pair<size_t, size_t> fromSize,
+        constexpr Index2DMapping(
+            Index2D<T> from_size,
             Index2DMode path)
-            : from_size_(std::move(fromSize)),
+            : from_size_(from_size),
               path_(path),
               inverse_path_(invert(path))
         {}
 
         [[nodiscard]]
-        constexpr std::pair<size_t, size_t>
-        get_from_indices(size_t i, size_t j) const
+        constexpr Index2D<T>
+        get_from_index(const Index2D<T>& to_index) const
         {
             const auto u = unsigned(inverse_path_);
             if (is_row_major(inverse_path_))
             {
-                return {(u & 0b10u) ? from_size_.first - 1 - i : i,
-                        (u & 1u) ? from_size_.second - 1 - j : j};
+                return {
+                    (u & 0b10u) ? from_size_.row - 1 - to_index.row : to_index.row,
+                    (u & 0b01u) ? from_size_.column - 1 - to_index.column : to_index.column
+                };
             }
             else
             {
-                return {(u & 1u) ? from_size_.first - 1 - j : j,
-                        (u & 0b10u) ? from_size_.second - 1 - i : i};
+                return {
+                    (u & 0b01u) ? from_size_.row - 1 - to_index.column : to_index.column,
+                    (u & 0b10u) ? from_size_.column - 1 - to_index.row : to_index.row
+                };
             }
         }
 
         [[nodiscard]]
-        constexpr std::pair<size_t, size_t>
-        get_to_indices(size_t i, size_t j) const
+        constexpr Index2D<T>
+        get_to_index(const Index2D<T>& from_index) const
         {
             const auto u = unsigned(path_);
             if (is_row_major(path_))
             {
-                return {(u & 0b10u) ? from_size_.first - 1 - i : i,
-                        (u & 1u) ? from_size_.second - 1 - j : j};
+                return {
+                    (u & 0b10u) ? from_size_.row - 1 - from_index.row : from_index.row,
+                    (u & 0b01u) ? from_size_.column - 1 - from_index.column : from_index.column
+                };
             }
             else
             {
-                return {(u & 1u) ? from_size_.second - 1 - j : j,
-                        (u & 0b10u) ? from_size_.first - 1 - i : i};
+                return {
+                    (u & 0b01u) ? from_size_.column - 1 - from_index.column : from_index.column,
+                    (u & 0b10u) ? from_size_.row - 1 - from_index.row : from_index.row
+                };
             }
         }
 
         [[nodiscard]]
-        constexpr std::pair<size_t, size_t> get_from_size() const
+        constexpr Index2D<T> get_from_size() const
         {
             return from_size_;
         }
 
         [[nodiscard]]
-        constexpr std::pair<size_t, size_t> get_to_size() const
+        constexpr Index2D<T> get_to_size() const
         {
             if (is_row_major(path_))
                 return from_size_;
             else
-                return {from_size_.second, from_size_.first};
+                return {from_size_.column, from_size_.row};
         }
 
     private:
-        std::pair<size_t, size_t> from_size_;
+        Index2D<T> from_size_;
         Index2DMode path_;
         Index2DMode inverse_path_;
     };

@@ -9,7 +9,7 @@
 #include <algorithm>
 #include <cmath>
 #include "MutableArrayView2D.hpp"
-#include "Index2DMap.hpp"
+#include "Index2DMapping.hpp"
 
 namespace Chorasmia
 {
@@ -42,7 +42,7 @@ namespace Chorasmia
               const MutableArrayView2D<T>& dst,
               Index2DMode path)
     {
-        const Index2DMap mapping(src.dimensions(), path);
+        const Index2DMapping mapping(Index2D(src.dimensions()), path);
         if (mapping.get_to_size() != dst.dimensions())
             CHORASMIA_THROW("dst has incorrect dimensions.");
         const auto[m, n] = mapping.get_to_size();
@@ -50,7 +50,7 @@ namespace Chorasmia
         {
             for (size_t j = 0; j < n; ++j)
             {
-                dst(i, j) = src(mapping.get_from_indices(i, j));
+                dst[{i, j}] = src[mapping.get_from_index({i, j})];
             }
         }
     }
@@ -119,24 +119,24 @@ namespace Chorasmia
 
         if (!on_boundary)
         {
-            // If we're not on the boundary we can use all the array values.
-            return array(i_idx, j_idx) * weights[0]
-                   + array(i_idx + 1, j_idx) * weights[1]
-                   + array(i_idx, j_idx + 1) * weights[2]
-                   + array(i_idx + 1, j_idx + 1) * weights[3];
+            // If we're not on the boundary, we can use all the array values.
+            return array[{i_idx, j_idx}] * weights[0]
+                   + array[{i_idx + 1, j_idx}] * weights[1]
+                   + array[{i_idx, j_idx + 1}] * weights[2]
+                   + array[{i_idx + 1, j_idx + 1}] * weights[3];
         }
 
-        // If we're on the boundary we only get the array values that are
+        // If we're on the boundary, we only get the array values that are
         // inside the array.
         T result = {};
         if (weights[0] != 0)
-            result += array(i_idx, j_idx) * weights[0];
+            result += array[{i_idx, j_idx}] * weights[0];
         if (weights[1] != 0)
-            result += array(i_idx + 1, j_idx) * weights[1];
+            result += array[{i_idx + 1, j_idx}] * weights[1];
         if (weights[2] != 0)
-            result += array(i_idx, j_idx + 1) * weights[2];
+            result += array[{i_idx, j_idx + 1}] * weights[2];
         if (weights[3] != 0)
-            result += array(i_idx + 1, j_idx + 1) * weights[3];
+            result += array[{i_idx + 1, j_idx + 1}] * weights[3];
         return result;
     }
 }

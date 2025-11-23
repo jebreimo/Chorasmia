@@ -20,35 +20,26 @@ namespace Chorasmia
         constexpr MutableArrayView2D() = default;
 
         constexpr MutableArrayView2D(T* data,
-                                     size_t rows,
-                                     size_t columns) noexcept
-            : MutableArrayView2D(data, rows, columns, 0)
+                                     Size2D<size_t> size) noexcept
+            : MutableArrayView2D(data, size, 0)
         {}
 
         constexpr MutableArrayView2D(T* data,
-                                     size_t rows,
-                                     size_t columns,
+                                     Size2D<size_t> size,
                                      size_t row_gap_size) noexcept
             : data_(data),
-              row_count_(rows),
-              col_count_(columns),
+              size_(size),
               row_gap_(row_gap_size)
         {}
 
         [[nodiscard]]
-        T& operator()(size_t row, size_t column) const noexcept
+        T& operator[](const Index2D<size_t>& pos) const noexcept
         {
-            return data_[row * row_size() + column];
+            return data_[pos.row * row_size() + pos.column];
         }
 
         [[nodiscard]]
-        T& operator()(const std::pair<size_t, size_t>& pos) const noexcept
-        {
-            return operator()(pos.first, pos.second);
-        }
-
-        [[nodiscard]]
-        constexpr MutableArrayView<T> operator[](size_t row) const noexcept
+        constexpr MutableArrayView<T> row(size_t row) const noexcept
         {
             return {data() + row * row_size(), col_count()};
         }
@@ -62,7 +53,7 @@ namespace Chorasmia
         [[nodiscard]]
         constexpr bool empty() const noexcept
         {
-            return row_count_ == 0 || col_count_ == 0;
+            return is_empty(size_);
         }
 
         [[nodiscard]]
@@ -88,44 +79,38 @@ namespace Chorasmia
         }
 
         [[nodiscard]]
-        MutableArrayView2D subarray(size_t row, size_t column,
-                                    size_t n_rows = SIZE_MAX,
-                                    size_t n_cols = SIZE_MAX) const
+        MutableArrayView2D subarray(Extent2D<size_t> extent) const
         {
-            row = std::min(row, row_count());
-            column = std::min(column, col_count());
-            n_rows = std::min(n_rows, row_count() - row);
-            n_cols = std::min(n_cols, col_count() - column);
+            extent = clamp(extent, size_);
             return {
-                data() + row * row_size() + column,
-                n_rows,
-                n_cols,
-                row_gap_ + col_count() - n_cols
+                data() + extent.origin.row * col_count() + extent.origin.column,
+                extent.size,
+                col_count() - extent.size.columns
             };
         }
 
         [[nodiscard]]
-        constexpr std::pair<size_t, size_t> dimensions() const noexcept
+        constexpr Index2D<size_t> dimensions() const noexcept
         {
-            return {row_count_, col_count_};
+            return {size_.rows, size_.columns};
         }
 
         [[nodiscard]]
         constexpr size_t row_count() const noexcept
         {
-            return row_count_;
+            return size_.rows;
         }
 
         [[nodiscard]]
         constexpr size_t col_count() const noexcept
         {
-            return col_count_;
+            return size_.columns;
         }
 
         [[nodiscard]]
         constexpr size_t value_count() const noexcept
         {
-            return row_count_ * col_count_;
+            return size_.rows * size_.columns;
         }
 
         [[nodiscard]]
@@ -145,8 +130,7 @@ namespace Chorasmia
         friend bool
         operator==(const MutableArrayView2D& a, const MutableArrayView2D& b)
         {
-            if (a.row_count() != b.row_count()
-                || a.col_count() != b.col_count())
+            if (a.size_ != b.size_)
                 return false;
             if (a.row_gap_ == b.row_gap_ && a.data() == b.data())
                 return true;
@@ -171,8 +155,7 @@ namespace Chorasmia
         }
 
         T* data_ = nullptr;
-        size_t row_count_ = 0;
-        size_t col_count_ = 0;
+        Index2D<size_t> size_;
         size_t row_gap_ = 0;
     };
 }

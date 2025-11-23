@@ -9,6 +9,8 @@
 #include "MutableArrayView2D.hpp"
 #include <string>
 
+#include "Extent2D.hpp"
+
 namespace Chorasmia
 {
     template <typename T>
@@ -20,22 +22,19 @@ namespace Chorasmia
 
         Array2D() = default;
 
-        Array2D(size_t rows, size_t columns)
-            : buffer_(rows * columns),
-              row_count_(rows),
-              col_count_(columns)
+        explicit Array2D(Size2D<size_t> size)
+            : buffer_(size.rows * size.columns),
+              size_(size)
         {}
 
-        Array2D(const T* values, size_t rows, size_t columns)
-            : buffer_(values, values + rows * columns),
-              row_count_(rows),
-              col_count_(columns)
+        Array2D(const T* values, Size2D<size_t> size)
+            : buffer_(values, values + size.rows * size.columns),
+              size_(size)
         {}
 
-        Array2D(std::vector<T> values, size_t rows, size_t columns)
+        Array2D(std::vector<T> values, Size2D<size_t> size)
             : buffer_(std::move(values)),
-              row_count_(rows),
-              col_count_(columns)
+              size_(size)
         {
             if (value_count() != buffer_.size())
             {
@@ -46,37 +45,19 @@ namespace Chorasmia
         }
 
         [[nodiscard]]
-        const T& operator()(size_t row, size_t column) const noexcept
+        const T& operator[](Index2D<size_t> index) const noexcept
         {
-            return buffer_[row * col_count() + column];
+            return buffer_[index.row * col_count() + index.column];
         }
 
         [[nodiscard]]
-        T& operator()(size_t row, size_t column) noexcept
-        {
-            return buffer_[row * col_count() + column];
-        }
-
-        [[nodiscard]]
-        const T& operator()(const std::pair<size_t, size_t>& pos) const noexcept
-        {
-            return operator()(pos.first, pos.second);
-        }
-
-        [[nodiscard]]
-        T& operator()(const std::pair<size_t, size_t>& pos) noexcept
-        {
-            return operator()(pos.first, pos.second);
-        }
-
-        [[nodiscard]]
-        constexpr ArrayView<T> operator[](size_t row) const
+        constexpr ArrayView<T> row(size_t row) const
         {
             return {data() + row * col_count(), col_count()};
         }
 
         [[nodiscard]]
-        constexpr MutableArrayView<T> operator[](size_t row)
+        constexpr MutableArrayView<T> row(size_t row)
         {
             return {data() + row * col_count(), col_count()};
         }
@@ -107,12 +88,12 @@ namespace Chorasmia
 
         constexpr ArrayView2D<T> view() const noexcept
         {
-            return {data(), row_count(), col_count()};
+            return {data(), size_};
         }
 
         constexpr MutableArrayView2D<T> mut() noexcept
         {
-            return {data(), row_count(), col_count()};
+            return {data(), size_};
         }
 
         [[nodiscard]]
@@ -128,93 +109,86 @@ namespace Chorasmia
         }
 
         [[nodiscard]]
-        ArrayView2D<T> subarray(size_t row, size_t column,
-                                size_t n_rows = SIZE_MAX,
-                                size_t n_cols = SIZE_MAX) const
+        ArrayView2D<T>
+        subarray(Extent2D<size_t> extent) const
         {
-            row = std::min(row, row_count());
-            column = std::min(column, col_count());
-            n_rows = std::min(n_rows, row_count() - row);
-            n_cols = std::min(n_cols, col_count() - column);
-            return {data() + row * col_count() + column,
-                    n_rows,
-                    n_cols,
-                    col_count() - n_cols};
+            extent = clamp(extent, size_);
+            return {
+                data() + extent.origin.row * col_count() + extent.origin.column,
+                extent.size,
+                col_count() - extent.size.columns
+            };
         }
 
         [[nodiscard]]
-        MutableArrayView2D<T> subarray(size_t row, size_t column,
-                                       size_t n_rows = SIZE_MAX,
-                                       size_t n_cols = SIZE_MAX)
+        MutableArrayView2D<T>
+        subarray(Extent2D<size_t> extent)
         {
-            row = std::min(row, row_count());
-            column = std::min(column, col_count());
-            n_rows = std::min(n_rows, row_count() - row);
-            n_cols = std::min(n_cols, col_count() - column);
-            return {data() + row * col_count() + column,
-                    n_rows,
-                    n_cols,
-                    col_count() - n_cols};
+            extent = clamp(extent, size_);
+            return {
+                data() + extent.origin.row * col_count() + extent.origin.column,
+                extent.size,
+                col_count() - extent.size.columns
+            };
         }
 
         [[nodiscard]]
-        constexpr std::pair<size_t, size_t> dimensions() const noexcept
+        constexpr Size2D<size_t> dimensions() const noexcept
         {
-            return {row_count_, col_count_};
+            return size_;
         }
 
         [[nodiscard]]
         constexpr size_t row_count() const noexcept
         {
-            return row_count_;
+            return size_.rows;
         }
 
         [[nodiscard]]
         constexpr size_t col_count() const noexcept
         {
-            return col_count_;
+            return size_.columns;
         }
 
         [[nodiscard]]
         constexpr size_t value_count() const noexcept
         {
-            return row_count_ * col_count_;
+            return size_.rows * size_.columns;
         }
 
-        void resize(size_t rows, size_t columns)
+        void resize(Size2D<size_t> size)
         {
             auto old_value_count = value_count();
-            auto old_rows = this->row_count();
-            auto old_columns = this->col_count();
-            auto new_size = rows * columns;
-            buffer_.resize(new_size);
-            row_count_ = rows;
-            col_count_ = columns;
+            auto old_size = size_;
+            auto value_count = size.rows * size.columns;
+            buffer_.resize(value_count);
+            size_ = size;
 
-            if (old_rows == 0)
+            if (old_size.rows == 0)
                 return;
 
-            if (columns > old_columns)
+            if (size.columns > old_size.columns)
             {
                 auto src = buffer_.data() + old_value_count - 1;
-                auto dst = buffer_.data() + (old_rows - 1) * columns + old_columns - 1;
+                auto dst = buffer_.data() + (old_size.rows - 1) * size.columns + old_size.columns -
+                    1;
                 while (src != dst)
                 {
-                    for (size_t i = 0; i < old_columns; ++i)
+                    for (size_t i = 0; i < old_size.columns; ++i)
                         *dst-- = *src--;
-                    for (size_t i = 0; i < columns - old_columns; ++i)
+                    for (size_t i = 0; i < size.columns - old_size.columns; ++i)
                         *dst-- = 0;
                 }
             }
-            else if (columns < old_columns)
+            else if (size.columns < old_size.columns)
             {
-                auto src = buffer_.data() + old_columns;
-                auto dst = buffer_.data() + columns;
-                for (size_t i = 0; i < old_rows - 1; ++i)
+                auto src = buffer_.data() + old_size.columns;
+                auto dst = buffer_.data() + size.columns;
+                for (size_t i = 0; i < old_size.rows - 1; ++i)
                 {
-                    for (size_t j = 0; j < columns; ++j)
+                    for (size_t j = 0; j < size.columns; ++j)
                         *dst++ = *src++;
-                    src += old_columns - columns;
+                    src += old_size.columns - size.columns;
                 }
             }
         }
@@ -246,7 +220,7 @@ namespace Chorasmia
         [[nodiscard]]
         std::vector<T> release()
         {
-            row_count_ = col_count_ = 0;
+            size_.rows = size_.columns = 0;
             auto tmp = std::move(buffer_);
             return std::move(tmp);
         }
@@ -259,9 +233,8 @@ namespace Chorasmia
         [[nodiscard]]
         friend bool operator==(const Array2D& a, const Array2D& b)
         {
-            return a.row_count() == b.row_count()
-                   && a.col_count() == b.col_count()
-                   && a.buffer_ == b.buffer_;
+            return a.size_ == b.size_
+                && a.buffer_ == b.buffer_;
         }
 
         [[nodiscard]]
@@ -287,9 +260,9 @@ namespace Chorasmia
         {
             return a.size();
         }
+
     private:
         std::vector<T> buffer_;
-        size_t row_count_ = 0;
-        size_t col_count_ = 0;
+        Size2D<size_t> size_;
     };
 }

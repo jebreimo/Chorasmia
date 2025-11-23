@@ -6,7 +6,7 @@
 # License text is included with the source distribution.
 # ===========================================================================
 cmake_minimum_required(VERSION 3.16)
-project(Chorasmia VERSION 0.3.0)
+project(Chorasmia VERSION 0.4.0)
 
 set(CMAKE_CXX_STANDARD 20)
 
@@ -27,7 +27,11 @@ option(CHORASMIA_INSTALL "Generate the install target" ${CHORASMIA_MASTER_PROJEC
 
 include(GNUInstallDirs)
 
-add_library(Chorasmia INTERFACE)
+add_library(Chorasmia INTERFACE
+    include/Chorasmia/Index2D.hpp
+    include/Chorasmia/Extent2D.hpp
+    include/Chorasmia/SaturationMath.hpp
+)
 
 target_include_directories(Chorasmia
     INTERFACE
