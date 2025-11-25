@@ -28,6 +28,8 @@ TEST_CASE("MutableArrayView2D subarray")
     REQUIRE(grid[{3, 3}] == 0);
     subgrid[{1, 1}] = 7;
     REQUIRE(grid[{3, 3}] == 7);
+    auto view = subgrid.view();
+    REQUIRE(view[{1, 1}] == 7);
 }
 
 TEST_CASE("MutableArrayView2D subarray iterator")

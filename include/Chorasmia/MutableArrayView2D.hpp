@@ -64,7 +64,7 @@ namespace Chorasmia
 
         constexpr ArrayView2D<T> view() const noexcept
         {
-            return {data(), row_count(), col_count(), row_gap_};
+            return {data(), {row_count(), col_count()}, row_gap_};
         }
 
         [[nodiscard]]
