@@ -28,7 +28,7 @@ namespace Chorasmia
         = enable_bitmask_operators<E>::enable;
 
     template <typename E>
-    std::enable_if_t<enable_bitmask_operators_v<E>, E>
+    constexpr std::enable_if_t<enable_bitmask_operators_v<E>, E>
     operator&(E lhs, E rhs)
     {
         typedef std::underlying_type_t<E> underlying;
@@ -37,7 +37,7 @@ namespace Chorasmia
     }
 
     template <typename E>
-    std::enable_if_t<enable_bitmask_operators_v<E>, E>
+    constexpr std::enable_if_t<enable_bitmask_operators_v<E>, E>
     operator|(E lhs, E rhs)
     {
         typedef std::underlying_type_t<E> underlying;
@@ -46,7 +46,7 @@ namespace Chorasmia
     }
 
     template <typename E>
-    std::enable_if_t<enable_bitmask_operators_v<E>, E>
+    constexpr std::enable_if_t<enable_bitmask_operators_v<E>, E>
     operator^(E lhs, E rhs)
     {
         typedef std::underlying_type_t<E> underlying;
@@ -55,7 +55,7 @@ namespace Chorasmia
     }
 
     template <typename E>
-    std::enable_if_t<enable_bitmask_operators_v<E>, E&>
+    constexpr std::enable_if_t<enable_bitmask_operators_v<E>, E&>
     operator&=(E& lhs, E rhs)
     {
         typedef std::underlying_type_t<E> underlying;
@@ -65,7 +65,7 @@ namespace Chorasmia
     }
 
     template <typename E>
-    std::enable_if_t<enable_bitmask_operators_v<E>, E&>
+    constexpr std::enable_if_t<enable_bitmask_operators_v<E>, E&>
     operator|=(E& lhs, E rhs)
     {
         typedef std::underlying_type_t<E> underlying;
@@ -75,7 +75,7 @@ namespace Chorasmia
     }
 
     template <typename E>
-    std::enable_if_t<enable_bitmask_operators_v<E>, E&>
+    constexpr std::enable_if_t<enable_bitmask_operators_v<E>, E&>
     operator^=(E& lhs, E rhs)
     {
         typedef std::underlying_type_t<E> underlying;
